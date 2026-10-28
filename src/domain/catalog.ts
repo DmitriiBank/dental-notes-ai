@@ -24,3 +24,99 @@ export const TREATMENTS = [
 ] as const;
 
 export const SYMPTOMS = ["Холод", "Тепло", "Самопроизвольная боль", "Боль при жевании", "Чувствительность к перкуссии", "Чувствительность к пальпации", "Постоянная боль", "Отек", "Свищ", "Подвижность", "Жалоб нет"];
+
+export const FINDING_GROUPS = [
+  {
+    "label": "Норма и статус зуба",
+    "ids": [
+      "intact",
+      "no-mobility",
+      "no-pockets"
+    ]
+  },
+  {
+    "label": "Диагностические пробы",
+    "ids": [
+      "percussion-positive",
+      "percussion-negative",
+      "palpation-positive",
+      "palpation-negative",
+      "cold-positive",
+      "cold-negative"
+    ]
+  },
+  {
+    "label": "Кариес и дефекты тканей",
+    "ids": [
+      "primary-caries",
+      "secondary-caries",
+      "deep-caries",
+      "cervical-caries",
+      "root-caries",
+      "deep-cervical-lesion",
+      "cervical-lesion",
+      "wear",
+      "crown-destruction",
+      "subgingival-destruction",
+      "residual-root",
+      "fracture",
+      "crack",
+      "chip",
+      "short-roots",
+      "poor-prognosis"
+    ]
+  },
+  {
+    "label": "Пломбы и ортопедические конструкции",
+    "ids": [
+      "filling",
+      "defective-filling",
+      "fractured-filling",
+      "artificial-crown",
+      "defective-crown",
+      "loose-crown",
+      "crown-with-root",
+      "temporary-crown-existing",
+      "bridge-abutment",
+      "bridge-pontic",
+      "post-core",
+      "fiber-post"
+    ]
+  },
+  {
+    "label": "Пародонт и подвижность",
+    "ids": [
+      "mobility",
+      "recession",
+      "pocket",
+      "inflammation",
+      "bleeding",
+      "bone-loss",
+      "furcation"
+    ]
+  },
+  {
+    "label": "Эндодонтия и периапикальные изменения",
+    "ids": [
+      "treated-canals",
+      "incomplete-rct",
+      "suspected-endo",
+      "periapical",
+      "lateral-radiolucency",
+      "furcation-radiolucency",
+      "fistula",
+      "swelling"
+    ]
+  },
+  {
+    "label": "Положение зубов и мягкие ткани",
+    "ids": [
+      "impacted",
+      "partially-impacted",
+      "dystopic",
+      "buccal",
+      "soft-tissue-trauma"
+    ]
+  }
+] as const;
+export const findingGroupFor = (id:string):string => FINDING_GROUPS.find(group=>(group.ids as readonly string[]).includes(id))?.label??"Другие находки";
