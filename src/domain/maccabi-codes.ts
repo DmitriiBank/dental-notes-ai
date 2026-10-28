@@ -48,6 +48,11 @@ function forTreatment(draft:ClinicalDraft,treatment:Treatment):MaccabiCodeCandid
     return[candidate(draft,treatment,CODES.acrylicFlipper,"needs-review","Уточните акрил или Valplast."),candidate(draft,treatment,CODES.valplastFlipper,"needs-review","Уточните акрил или Valplast.")];
   }
   if(treatment.kind==="reinforced-denture")return[candidate(draft,treatment,CODES.mesh)];
+  if(treatment.kind==="temporary-crown"){
+    if(treatment.material==="chairside-acrylic")return[candidate(draft,treatment,CODES.temporaryCrownChairside)];
+    if(treatment.material==="laboratory-acrylic")return[candidate(draft,treatment,CODES.temporaryCrownLaboratory)];
+    return [candidate(draft,treatment,CODES.temporaryCrownChairside,"needs-review","Укажите способ изготовления: в кресле или лабораторный."),candidate(draft,treatment,CODES.temporaryCrownLaboratory,"needs-review","Укажите способ изготовления: в кресле или лабораторный.")];
+  }
   if(treatment.kind==="temporary-filling")return[candidate(draft,treatment,CODES.temporaryFilling)];
   if(treatment.kind==="zirconia-crown"){
     if(treatment.material?.toLowerCase().includes("monolithic"))return[candidate(draft,treatment,CODES.monolithic)];
