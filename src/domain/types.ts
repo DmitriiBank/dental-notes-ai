@@ -59,6 +59,14 @@ export interface Treatment {
   includeReplacedTeethInText?: boolean;
   replacedTeeth?: number[];
   followUpDays?: 3 | 7 | 14 | 30;
+  canalCount?: 1 | 2 | 3 | 4;
+  crownMaterial?: "pfm" | "other";
+  removalMethod?: "adapt-old-as-temporary" | "cut-crown-or-bridge";
+  sinusLiftMethod?: "open" | "closed";
+  relineKind?: "soft-chairside" | "soft-laboratory" | "hard-chairside" | "hard-laboratory";
+  overdentureAttachment?: "ball" | "bar";
+  implantCount?: 2 | 3 | 4;
+
 }
 
 export interface Alternative {
