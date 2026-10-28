@@ -64,6 +64,7 @@ export type PatientDecision =
 
 export interface MedicationRecord {
   id: string;
+  presetId?: "augmentin-500-125" | "augmentin-875-125" | "azithromycin-penicillin-allergy";
   name: string;
   concentration?: string;
   dose?: string;
@@ -74,6 +75,8 @@ export interface MedicationRecord {
   status: "prescribed" | "administered" | "recommended";
   unknownDetails?: boolean;
   notes?: string;
+  penicillinAllergyAlternative?: boolean;
+  clinicianSelectionConfirmed?: boolean;
 }
 
 export interface BridgeAbutment {

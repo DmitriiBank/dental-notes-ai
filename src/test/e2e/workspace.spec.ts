@@ -160,3 +160,18 @@ test("medication safety flags are rendered in Hebrew without internal English ke
   await expect(record).toHaveValue(/נדרשת בדיקה קלינית/u);
   await expect(record).not.toHaveValue(/osteoporosis|clinical review/u);
 });
+
+test("dentist can prescribe exact Augmentin strengths and explicitly confirm a penicillin-allergy alternative",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"Лекарства",exact:true}).click();
+  await page.getByRole("button",{name:"Аугментин 500/125 мг",exact:true}).click();
+  await page.getByRole("button",{name:"Аугментин 875/125 мг",exact:true}).click();
+  const record=page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveValue(/Augmentin; ריכוז 500\/125 mg/u);
+  await expect(record).toHaveValue(/Augmentin; ריכוז 875\/125 mg/u);
+  await expect(record).not.toHaveValue(/תדירות|משך|מנה/u);
+  await page.getByRole("button",{name:"Азитромицин — при аллергии на пенициллин",exact:true}).click();
+  await expect(record).toHaveValue(/הבחירה כחלופה לאלרגיה לפניצילין טרם אושרה על ידי רופא/u);
+  await page.getByText("Подтверждаю выбор препарата после проверки аллергической реакции и клинического показания",{exact:true}).click();
+  await expect(record).toHaveValue(/נבחרה חלופה עקב אלרגיה מתועדת לפניצילין/u);
+});

@@ -30,6 +30,7 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
   (d.medications ?? []).forEach(medication => {
     if (!medication.name.trim()) add(`medication-name-${medication.id}`, "blocking", "Для лекарственной записи необходимо явно указать название препарата.");
     if (medication.allergyCheck === "not-checked") add(`medication-allergy-${medication.id}`, "review", "Проверка лекарственной аллергии не подтверждена.");
+    if (medication.penicillinAllergyAlternative && !medication.clinicianSelectionConfirmed) add(`medication-alternative-${medication.id}`, "blocking", "Антибиотик при аллергии на пенициллин требует явного подтверждения выбора врачом.");
   });
   const treatments=treatmentsFor(d);
   const invasiveKinds=new Set(["extraction","surgical-extraction","implant-placement","bone-augmentation","sinus-lift"]);
