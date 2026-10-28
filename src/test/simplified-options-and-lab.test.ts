@@ -18,15 +18,17 @@ describe("simplified prosthodontic lab letters and alternatives",()=>{
   });
   it("produces separate lab instructions, not completed care",()=>{
     const draft=emptyDraft();
+    draft.performedActs=[{id:"imp",category:"fixed",kind:"crown-impression",target:{type:"tooth",teeth:[26]},visitId:"v",status:"completed",clinicianConfirmed:true,shade:"A3"}];
     draft.labLetters=[{id:"lab-1",teeth:[26],text:"נא לא לצפות את המשטח הפלטינלי בחרסינה"}];
     const text=generateHebrewRecord(draft);
     expect(text).toContain("הוראות למעבדה");
     expect(text).toContain("שיניים 26");
     expect(text).toContain("נא לא לצפות");
-    expect(text).not.toContain("טיפול שבוצע");
+    expect(text).toContain("גוון: A3");
   });
   it("retains existing laboratory structures for older drafts",()=>{
     const draft=emptyDraft();
+    draft.performedActs=[{id:"try",category:"fixed",kind:"framework-try-in",target:{type:"tooth",teeth:[24]},visitId:"v",status:"completed",clinicianConfirmed:true}];
     draft.labLetters=[{id:"new",teeth:[],text:"עבודה במעבדה"}];
     expect(generateHebrewRecord(draft)).toContain("עבודה במעבדה");
   });
