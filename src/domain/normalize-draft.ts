@@ -13,5 +13,8 @@ export function normalizeDraft(input: ClinicalDraft): ClinicalDraft {
   draft.medications ??= [];
   draft.medicationSafetyReviews ??= [];
   draft.mentorChecklists ??= [];
+  draft.regionalComplaints ??= [];
+  draft.generalComplaints ??= [];
+  Object.values(draft.teeth).forEach(tooth=>{tooth.complaints??=[]});
   return draft;
 }

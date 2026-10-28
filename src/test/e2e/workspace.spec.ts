@@ -175,3 +175,47 @@ test("dentist can prescribe exact Augmentin strengths and explicitly confirm a p
   await page.getByText("Подтверждаю выбор препарата после проверки аллергической реакции и клинического показания",{exact:true}).click();
   await expect(record).toHaveValue(/נבחרה חלופה עקב אלרגיה מתועדת לפניצילין/u);
 });
+
+test("complaint tab supports bulk assignment and tooth-level isolation with live Hebrew output",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await expect(page.locator("button.chip.whitespace-nowrap")).toHaveText(["Жалобы","Находки","Лечение","Первая помощь","Снимки","Альтернативы","Лаборатория","Лекарства","Коды Maccabi"]);
+  await page.getByRole("button",{name:"Жалобы",exact:true}).click();
+  await page.getByRole("button",{name:"11",exact:true}).click();await page.getByRole("button",{name:"12",exact:true}).click();
+  await page.getByRole("button",{name:"Боль при накусывании",exact:true}).click();
+  const record=page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveValue(/סיבת הביקור:\nהמטופל מדווח על כאב בנשיכה בשיניים 11 ו12/u);
+  await page.getByRole("button",{name:"12",exact:true}).click();
+  await page.getByRole("button",{name:"Боль при накусывании",exact:true}).click();
+  await expect(record).toHaveValue(/כאב בנשיכה בשן 12/u);
+  await expect(record).not.toHaveValue(/כאב בנשיכה בשן 11/u);
+});
+
+test("complaints support no-complaint exclusivity, optional dropdown details and local saving",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"Жалобы",exact:true}).click();
+  await page.getByRole("button",{name:"36",exact:true}).click();
+  await page.getByRole("button",{name:"Самопроизвольная боль",exact:true}).click();
+  await page.getByRole("button",{name:"Жалоб нет",exact:true}).first().click();
+  await expect(page.getByRole("button",{name:"Жалоб нет",exact:true}).first()).toHaveAttribute("aria-pressed","true");
+  await expect(page.getByRole("button",{name:"Самопроизвольная боль",exact:true})).toHaveAttribute("aria-pressed","false");
+  await page.getByRole("button",{name:"Жалоб нет",exact:true}).first().click();
+  await page.getByRole("button",{name:"Чувствительность к холодному",exact:true}).click();
+  await page.getByLabel("Интенсивность: Чувствительность к холодному 36").selectOption("severe");
+  await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/רגישות לקור בשן 36, בעוצמה חזקה/u);
+  await page.getByRole("button",{name:"Сохранить локально",exact:true}).click();
+  await page.reload();await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"Загрузить локальный черновик",exact:true}).click();
+  await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/רגישות לקור בשן 36, בעוצמה חזקה/u);
+});
+
+test("region and general complaints remain separate from objective findings",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"Жалобы",exact:true}).click();
+  await page.getByLabel("Область жалобы").selectOption("Справа");
+  await page.getByRole("button",{name:"Локальная припухлость",exact:true}).click();
+  await page.getByRole("button",{name:"Профилактический осмотр",exact:true}).click();
+  const record=page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveValue(/נפיחות מקומית באזור הצד הימני/u);
+  await expect(record).toHaveValue(/בקשה לבדיקה תקופתית/u);
+  await expect(record).not.toHaveValue(/ממצאים קליניים/u);
+});

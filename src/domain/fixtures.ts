@@ -5,7 +5,7 @@ export function emptyDraft(): ClinicalDraft {
   return {
     examination: { complaint:"", extraoral:"", softTissues:"", occlusion:"", hygiene:"", periodontal:"", details:[], normalsConfirmed:false, medicalFlags:[] },
     teeth: emptyTeeth(), implants:[], imaging:[], alternatives:[], generalTreatments:[], edentulous:[], customDurations:{}, firstAidSelections:[], selectedMaccabiCodes:{}, eligibility:{ageGroup:"unknown",verified:false},
-    labConstructions:[], labOrders:[], externalProcedureDependencies:[], patientDecisions:[], medications:[], medicationSafetyReviews:[], mentorChecklists:[]
+    labConstructions:[], labOrders:[], externalProcedureDependencies:[], patientDecisions:[], medications:[], medicationSafetyReviews:[], mentorChecklists:[], regionalComplaints:[], generalComplaints:[]
   };
 }
 const tr = (id:string, kind:string, status:Treatment["status"], tooth?:number, surfaces?:Treatment["surfaces"]):Treatment => ({id,kind,status,tooth,surfaces});

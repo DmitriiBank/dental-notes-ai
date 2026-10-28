@@ -11,6 +11,7 @@ import {
 } from "./hebrew-catalog";
 import { groupFirstAidSelections } from "./first-aid-catalog";
 import { completedLabStageText, dependencyText, labConstructionText, labOrderRemakeText, medicationSafetyText, medicationText, patientDecisionText } from "./structured-clinical-text";
+import { complaintSentences } from "./complaint-catalog";
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const sentence = (value: string) => `${value.trim().replace(/[.;]+$/u, "")}.`;
@@ -109,7 +110,7 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   const examination = draft.examination;
   const firstAid = groupFirstAidSelections(draft.firstAidSelections ?? []);
 
-  const complaints = [examination.complaint.trim() ? sentence(examination.complaint) : "", ...(firstAid.get("complaint") ?? [])].filter(Boolean);
+  const complaints = [...complaintSentences(draft), examination.complaint.trim() ? sentence(examination.complaint) : "", ...(firstAid.get("complaint") ?? [])].filter(Boolean);
   if (complaints.length) sections.push(`סיבת הביקור:\n${unique(complaints).join(" ")}`);
   if (examination.extraoral.trim()) sections.push(`EO: ${sentence(examination.extraoral)}`);
   if (examination.softTissues.trim()) sections.push(`רקמות רכות: ${sentence(examination.softTissues)}`);
@@ -117,7 +118,8 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   if (examination.hygiene.trim()) sections.push(`OH: ${sentence(examination.hygiene)}`);
   if (examination.periodontal.trim()) sections.push(`פמ"ר: ${sentence(examination.periodontal)}`);
   if (examination.medicalFlags.length) sections.push(`אנמנזה רפואית:\n${sentence(hebrewList(unique(examination.medicalFlags)))}`);
-  const medicationLines = (draft.medications ?? []).map(medicationText).filter((value): value is string => Boolean(value));
+  const medicationLines = (draft.medications ?? []).filter(medication=>medication.status!=="recommended").map(medicationText).filter((value): value is string => Boolean(value));
+  const recommendedMedicationLines = (draft.medications ?? []).filter(medication=>medication.status==="recommended").map(medicationText).filter((value): value is string => Boolean(value));
   (draft.medicationSafetyReviews ?? []).map(medicationSafetyText).forEach(value=>medicationLines.push(value));
   if (medicationLines.length) sections.push(`תיעוד תרופתי:\n${medicationLines.join(" ")}`);
 
@@ -127,7 +129,8 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   Object.values(draft.teeth).map(toothFindingSentence).filter((value): value is string => Boolean(value)).forEach(value => clinicalFindings.push(value));
   const missing = Object.values(draft.teeth).filter(tooth => tooth.missing).map(tooth => String(tooth.number));
   if (missing.length && !draft.edentulous.length) clinicalFindings.push(sentence(`שיניים ${hebrewList(missing)} חסרות`));
-  examination.details.forEach(detail => clinicalFindings.push(sentence(detail)));
+  const recommendedDetails=examination.details.filter(detail=>/^הומלץ/u.test(detail.trim()));
+  examination.details.filter(detail=>!recommendedDetails.includes(detail)).forEach(detail => clinicalFindings.push(sentence(detail)));
   draft.implants.forEach(implant => {
     const implantFindings = unique(implant.findings).map(key => phrase(HEBREW_FINDINGS, key));
     clinicalFindings.push(sentence(`שתל באזור ${implant.region}${implantFindings.length ? `: ${hebrewList(implantFindings)}` : " קיים"}`));
@@ -135,7 +138,7 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   clinicalFindings.push(...(firstAid.get("clinical") ?? []));
   if (clinicalFindings.length) sections.push(`ממצאים קליניים:\n${clinicalFindings.join(" ")}`);
 
-  const radiology = [...draft.imaging.map(imagingSentence), ...(firstAid.get("radiology") ?? [])];
+  const radiology = [...draft.imaging.filter(imaging=>imaging.status!=="recommended").map(imagingSentence), ...(firstAid.get("radiology") ?? [])];
   if (radiology.length) sections.push(`ממצאים רדיולוגיים:\n${unique(radiology).join(" ")}`);
 
   const allTreatments = [...Object.values(draft.teeth).flatMap(tooth => tooth.treatments), ...draft.generalTreatments];
@@ -145,6 +148,9 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   if (completedText.length) sections.push(`טיפול שבוצע:\n${unique(completedText).join(" ")}`);
 
   const plan: string[] = [];
+  draft.imaging.filter(imaging=>imaging.status==="recommended").map(imagingSentence).forEach(value=>plan.push(value));
+  recommendedDetails.map(sentence).forEach(value=>plan.push(value));
+  recommendedMedicationLines.forEach(value=>plan.push(value));
   groupTreatments(allTreatments.filter(treatment => treatment.status !== "completed" && treatment.status !== "cancelled")).forEach(group => {
     plan.push(`${TREATMENT_STATUS[group[0].status]} ${groupedTreatmentText(group)}`);
   });
@@ -154,7 +160,7 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   (draft.externalProcedureDependencies ?? []).map(dependencyText).forEach(value=>plan.push(value));
   (draft.patientDecisions ?? []).map(patientDecisionText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
   plan.push(...(firstAid.get("recommendation") ?? []), ...(firstAid.get("counseling") ?? []));
-  if (plan.length) sections.push(`תוכנית טיפול והמלצות:\n${sentence(unique(plan).join("; "))}`);
+  if (plan.length) sections.push(`תוכנית טיפול והמלצות:\n${sentence(unique(plan).map(value=>value.trim().replace(/[.;]+$/u,"")).join("; "))}`);
 
   return cleanOutput(sections.join("\n\n"));
 }

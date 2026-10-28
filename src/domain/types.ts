@@ -11,8 +11,20 @@ export interface ToothState {
   findings: string[];
   surfaces: Surface[];
   symptoms: string[];
+  complaints?: ComplaintSelection[];
   treatments: Treatment[];
   notes?: string;
+}
+
+export type ComplaintOnset = "today" | "days" | "weeks" | "months" | "longstanding";
+export type ComplaintTrigger = "spontaneous" | "cold" | "hot" | "biting" | "sweet" | "touch" | "night";
+export type ComplaintSeverity = "mild" | "moderate" | "severe";
+export interface ComplaintSelection {
+  complaintId: string;
+  onset?: ComplaintOnset;
+  trigger?: ComplaintTrigger;
+  severity?: ComplaintSeverity;
+  region?: string;
 }
 
 export interface ImplantState {
@@ -224,6 +236,8 @@ export interface ClinicalDraft {
   medications?: MedicationRecord[];
   medicationSafetyReviews?: MedicationSafetyReview[];
   mentorChecklists?: MentorChecklist[];
+  regionalComplaints?: ComplaintSelection[];
+  generalComplaints?: ComplaintSelection[];
   updatedAt?: string;
 }
 

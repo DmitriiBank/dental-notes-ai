@@ -16,6 +16,7 @@ interface Store {
   selectMany: (n: number[]) => void;
   clearSelection: () => void;
   toggleFinding: (id: string) => void;
+  toggleComplaint: (id: string) => void;
   toggleSurface: (s: Surface) => void;
   addTreatment: (kind: string) => void;
   setEdentulous: (jaws: Jaw[]) => void;
@@ -33,6 +34,7 @@ export const useExamStore = create<Store>((set,get) => ({
   select: (n,multi=true) => set(s=>({selected:multi?(s.selected.includes(n)?s.selected.filter(x=>x!==n):[...s.selected,n]):[n]})),
   selectMany: selected => set({selected}), clearSelection:()=>set({selected:[]}),
   toggleFinding:id=>get().update(d=>get().selected.forEach(n=>{const a=d.teeth[n].findings;if(a.includes(id))a.splice(a.indexOf(id),1);else a.push(id)})),
+  toggleComplaint:id=>get().update(d=>get().selected.forEach(n=>{const a=d.teeth[n].complaints??=[];d.teeth[n].complaints=a;const index=a.findIndex(item=>item.complaintId===id);if(index>=0){a.splice(index,1);return}if(id==="none")a.splice(0);else{const none=a.findIndex(item=>item.complaintId==="none");if(none>=0)a.splice(none,1)}a.push({complaintId:id})})),
   toggleSurface:surface=>get().update(d=>get().selected.forEach(n=>{const a=d.teeth[n].surfaces;if(a.includes(surface))a.splice(a.indexOf(surface),1);else a.push(surface)})),
   addTreatment:kind=>get().update(d=>get().selected.forEach(n=>{const id=crypto.randomUUID();const t:Treatment={id,kind,status:"planned",tooth:n,surfaces:[...d.teeth[n].surfaces]};d.teeth[n].treatments.push(t)})),
   setEdentulous:jaws=>get().update(d=>{const nums=jaws.flatMap(j=>j==="upper"?UPPER:LOWER);nums.forEach(n=>{d.teeth[n].missing=true;d.teeth[n].findings=[];d.teeth[n].surfaces=[];d.teeth[n].treatments=[]});d.edentulous=Array.from(new Set([...d.edentulous,...jaws]));}),
