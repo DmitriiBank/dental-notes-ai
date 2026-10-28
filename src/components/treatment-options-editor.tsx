@@ -19,7 +19,7 @@ export function TreatmentOptionsEditor(){
     <label className="block text-xs font-bold">Вариант 2 · альтернативный план</label>
     <textarea className="w-full rounded-lg border p-2 text-sm" rows={3} value={options.second} onChange={e=>update({second:e.target.value,confirmed:false})} placeholder="Опишите второй вариант лечения"/>
     <label className="block text-xs font-bold">Выбор пациента</label>
-    <select className="w-full rounded-lg border p-2 text-sm" value={options.decision??""} onChange={e=>update({decision:e.target.value as "no-treatment"|"first"|"second"||undefined,confirmed:false})}>
+    <select className="w-full rounded-lg border p-2 text-sm" value={options.decision??""} onChange={e=>update({decision:e.target.value?e.target.value as "no-treatment"|"first"|"second":undefined,confirmed:false})}>
       <option value="">Решение не подтверждено</option>
       <option value="no-treatment">1. Не хочет лечиться</option>
       <option value="first">2. Выбрал вариант лечения 1</option>
