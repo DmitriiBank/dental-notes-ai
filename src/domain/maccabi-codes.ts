@@ -42,6 +42,41 @@ function forTreatment(draft:ClinicalDraft,treatment:Treatment):MaccabiCodeCandid
     if(count===1)return[candidate(draft,treatment,CODES.posterior1)];if(count===2)return[candidate(draft,treatment,CODES.posterior2)];if(count===3)return[candidate(draft,treatment,CODES.posterior3)];
     return[unresolved(draft,treatment,count>3?"Покрытие более трех поверхностей требует уточнения тарифа.":"Укажите поверхности реставрации.")];
   }
+  // The source tariff lists specific codes. Do not infer clinical qualifiers from tooth number.
+  if(treatment.kind==="observation"||treatment.kind==="denture-adjustment"||treatment.kind==="denture-remake")return [];
+  if(treatment.kind==="extraction")return[candidate(draft,{...treatment,provider:"external"},CODES.standardExtraction,"needs-review","Проверьте выполнение и право исполнителя.")];
+  if(treatment.kind==="surgical-extraction"){
+    if(treatment.tooth&&positionFor(treatment.tooth)===8)return[candidate(draft,{...treatment,provider:"external"},CODES.wisdomExtraction,"needs-review","Проверьте, соответствует ли процедура тарифу удаления зуба мудрости.")];
+    return[candidate(draft,{...treatment,provider:"external"},CODES.surgicalExtraction,"needs-review","Проверьте хирургическую категорию и исполнителя.")];
+  }
+  if(treatment.kind==="rct"||treatment.kind==="retreatment"){
+    if(!treatment.canalCount)return[unresolved(draft,treatment,"Укажите число каналов (1–4), не определяйте его автоматически по номеру зуба.")];
+    const codes=treatment.kind==="rct"?[CODES.rootCanal1,CODES.rootCanal2,CODES.rootCanal3,CODES.rootCanal4]:[CODES.retreatment1,CODES.retreatment2,CODES.retreatment3,CODES.retreatment4];
+    return[candidate(draft,{...treatment,provider:"external"},codes[treatment.canalCount-1],"needs-review","Проверьте число каналов и право исполнителя.")];
+  }
+  if(treatment.kind==="permanent-crown")return treatment.crownMaterial==="pfm"?[candidate(draft,treatment,CODES.pfmCrown,"needs-review","Проверьте вид металла и тарифную категорию.")]:[unresolved(draft,treatment,"Выберите PFM или уточните другой тип постоянной коронки.")];
+  if(treatment.kind==="crown-removal"){
+    if(treatment.removalMethod==="adapt-old-as-temporary")return[candidate(draft,treatment,CODES.oldCrownToTemporary,"needs-review","Подтвердите адаптацию старой коронки под временную.")];
+    if(treatment.removalMethod==="cut-crown-or-bridge")return[candidate(draft,treatment,CODES.crownBridgeRemoval,"needs-review","Проверьте число единиц и условия услуги.")];
+    return[unresolved(draft,treatment,"Уточните метод: адаптация старой коронки или разрезание и снятие.")];
+  }
+  if(treatment.kind==="sinus-lift"){
+    if(treatment.sinusLiftMethod==="open")return[candidate(draft,{...treatment,provider:"external"},CODES.sinusOpen,"needs-review","Тариф без кости и мембраны; проверьте исполнителя.")];
+    if(treatment.sinusLiftMethod==="closed")return[candidate(draft,{...treatment,provider:"external"},CODES.sinusClosed,"needs-review","Тариф без кости и мембраны; проверьте исполнителя.")];
+    return[unresolved(draft,treatment,"Выберите открытый или закрытый синус-лифтинг.")];
+  }
+  if(treatment.kind==="relining"){
+    const mapping={"soft-chairside":CODES.relineSoftChairside,"soft-laboratory":CODES.relineSoftLaboratory,"hard-chairside":CODES.relineHardChairside,"hard-laboratory":CODES.relineHardLaboratory};
+    return treatment.relineKind?[candidate(draft,treatment,mapping[treatment.relineKind],"needs-review","Проверьте вид протеза и условия включённой перебазировки.")]:[unresolved(draft,treatment,"Укажите мягкая/жёсткая и в клинике/лаборатории.")];
+  }
+  if(treatment.kind==="overdenture"){
+    const number=treatment.implantCount,attachment=treatment.overdentureAttachment;
+    if(!number||!attachment)return[unresolved(draft,treatment,"Укажите число имплантов 2–4 и тип фиксации: балка или шаровидные аттачменты.")];
+    const mapping={ball:{2:CODES.overdentureBall2,3:CODES.overdentureBall3,4:CODES.overdentureBall4},bar:{2:CODES.overdentureBar2,3:CODES.overdentureBar3,4:CODES.overdentureBar4}};
+    return[candidate(draft,treatment,mapping[attachment][number],"needs-review","Проверьте конструкцию и наличие подтверждённых имплантов.")];
+  }
+  if(treatment.kind==="bridge"||treatment.kind==="bridge-replacement"||treatment.kind==="implant-bridge")return[unresolved(draft,treatment,"Для мостов требуется расчёт по единицам с проверенными опорами и промежуточными частями. Не выставлять один общий код.")];
+  if(treatment.kind==="bone-augmentation")return[unresolved(draft,treatment,"Требуются вид аугментации, материалы и хирургический тариф.")];
   if(treatment.kind==="flipper"){
     if(treatment.material?.toLowerCase().includes("valplast"))return[candidate(draft,treatment,CODES.valplastFlipper)];
     if(treatment.material?.toLowerCase().includes("acryl"))return[candidate(draft,treatment,CODES.acrylicFlipper)];
@@ -69,7 +104,7 @@ function forTreatment(draft:ClinicalDraft,treatment:Treatment):MaccabiCodeCandid
   if(treatment.kind==="implant-crown")return[candidate(draft,treatment,CODES.implantCrown)];
   if(treatment.kind==="implant-core")return[candidate(draft,treatment,CODES.implantCore)];
   if(treatment.kind==="implant-placement")return[candidate(draft,{...treatment,provider:"external"},CODES.implant)];
-  if(treatment.kind==="surgical-extraction"&&treatment.tooth&&positionFor(treatment.tooth)===8)return[candidate(draft,{...treatment,provider:"external"},CODES.wisdomExtraction)];
+
   if(treatment.kind==="abscess-drainage")return[candidate(draft,treatment,CODES.abscess,"needs-review","Код допустим только по факту выполнения и с проверкой исполнителя.")];
   return[unresolved(draft,treatment,"Для этой процедуры нет подтвержденного соответствия в частичном тарифном снимке.")];
 }
