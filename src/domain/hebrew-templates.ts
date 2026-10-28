@@ -14,6 +14,7 @@ import { complaintSentences } from "./complaint-catalog";
 import { consultationText } from "./consultation-catalog";
 import { aggregateClinicalFindings, toothSpecificClinicalDetails } from "./clinical-presentation";
 import { discussionText, groupedPerformedTexts } from "./performed-treatment";
+import {generateLabLetter} from "./lab-letter";
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const sentence = (value: string) => `${value.trim().replace(/[.;]+$/u, "")}.`;
@@ -165,7 +166,7 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   plan.push(...(firstAid.get("recommendation") ?? []), ...(firstAid.get("counseling") ?? []));
   if (plan.length) sections.push(`תוכנית טיפול והמלצות:\n${sentence(unique(plan).map(value=>value.trim().replace(/[.;]+$/u,"")).join("; "))}`);
 
-  const letters=(draft.labLetters??[]).filter(letter=>letter.text.trim()).map(letter=>`${letter.teeth.length?`שיניים ${letter.teeth.join(", ")}: `:""}${letter.text.trim()}`);
+  const letters=(draft.labLetters??[]).map(letter=>generateLabLetter(draft,letter.teeth,letter.text)).filter(Boolean);
   if(letters.length)sections.push(`הוראות למעבדה:\n${letters.join("\n")}`);
   return cleanOutput(sections.join("\n\n"));
 }
