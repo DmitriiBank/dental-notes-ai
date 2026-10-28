@@ -16,6 +16,8 @@ export const MACCABI_CATALOG = {
   anteriorComposite:{shortCode:"צהק",catalogNumber:"13500",descriptionHe:"ציפוי קומפוזיט בשן קדמית/השלמת כותרת שן קדמית",eligibility:"requires-context"},
   anteriorClass4:{shortCode:"סל4",catalogNumber:"13530",descriptionHe:"סתימה לבנה קלאס class 4",eligibility:"requires-context"},
   anteriorClass35:{shortCode:"סל",catalogNumber:"13535",descriptionHe:"סתימה לבנה קלאס class 3,5",eligibility:"requires-context"},
+  temporaryCrownChairside:{shortCode:"כז",catalogNumber:"13165",descriptionHe:"כתר זמני אקרילי",eligibility:"base"},
+  temporaryCrownLaboratory:{shortCode:"כזמ",catalogNumber:"13170",descriptionHe:"כתר זמני אקרילי המיוצר במעבדה",eligibility:"base"},
   temporaryFilling:{shortCode:"סז",catalogNumber:"13520",descriptionHe:"סתימה זמנית",eligibility:"base"},
   acrylicFlipper:{shortCode:"תחלא",catalogNumber:"13440",descriptionHe:"פליפר אקרילי זמני עד שתי שיניים",eligibility:"base"},
   valplastFlipper:{shortCode:"תחפו",catalogNumber:"10104",descriptionHe:"פליפר Valplast עד שתי שיניים",eligibility:"base"},
