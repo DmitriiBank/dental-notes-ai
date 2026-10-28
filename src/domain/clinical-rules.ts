@@ -11,6 +11,7 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
   Object.values(d.teeth).forEach(t => {
     if (t.missing && (t.findings.length || t.treatments.some(x => !["implant-consult"].includes(x.kind)))) add(`missing-${t.number}`, "blocking", `Зуб ${t.number}: отсутствующий естественный зуб содержит несовместимые данные.`);
     if (t.findings.some(f => f.includes("caries")) && !t.surfaces.length) add(`surface-${t.number}`, "review", `Зуб ${t.number}: для кариеса не выбраны поверхности.`);
+    if(t.findings.includes("intact")&&t.findings.some(f=>f!=="intact"))add(`intact-conflict-${t.number}`,"blocking",`Зуб ${t.number}: клиническая норма несовместима с выбранной патологической находкой.`);
     const crown = t.treatments.find(x => x.kind.includes("crown") && ["planned", "recommended"].includes(x.status));
     const rct = t.treatments.find(x => ["rct", "retreatment"].includes(x.kind) && x.status !== "completed");
     if (crown && rct) add(`sequence-${t.number}`, "blocking", `Зуб ${t.number}: до коронки требуется завершить эндодонтический этап и повторно оценить восстановимость.`);
@@ -34,6 +35,7 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
   });
   (d.consultations??[]).forEach(item=>{if(item.target.kind==="teeth"&&!item.target.teeth.length)add(`consultation-target-${item.id}`,"blocking","Для консультации необходимо выбрать хотя бы один зуб или другой объект направления.");if(item.status==="completed"&&!item.completionConfirmed)add(`consultation-completion-${item.id}`,"blocking","Завершенная консультация требует явного подтверждения врача.");});
   const treatments=treatmentsFor(d);
+  treatments.filter(item=>["complete-denture","partial-denture","immediate-denture","overdenture"].includes(item.kind)&&!item.jaw).forEach(item=>add(`denture-jaw-${item.id}`,"blocking","Для съемного протеза необходимо явно выбрать верхнюю или нижнюю челюсть."));
   const invasiveKinds=new Set(["extraction","surgical-extraction","implant-placement","bone-augmentation","sinus-lift"]);
   const invasive=treatments.some(treatment=>["planned","recommended"].includes(treatment.status)&&invasiveKinds.has(treatment.kind));
   const osteoporosis=d.examination.medicalFlags.some(flag=>/osteoporosis|אוסטאופורוזיס|остеопороз/ui.test(flag))||(d.medicationSafetyReviews??[]).some(review=>review.riskFlags.includes("osteoporosis"));

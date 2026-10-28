@@ -4,12 +4,12 @@ import { emptyDraft } from "@/domain/fixtures";
 import { generateHebrewRecord } from "@/domain/hebrew-templates";
 import { useExamStore } from "@/store/examination-store";
 
-describe("107-item complaint catalog",()=>{
+describe("versioned complaint catalog with the 107 supplied entries and the added return-after-imaging reason",()=>{
   beforeEach(()=>{localStorage.clear();useExamStore.getState().reset()});
 
-  it("contains exactly 107 unique deterministic entries",()=>{
-    expect(COMPLAINT_CATALOG).toHaveLength(107);
-    expect(new Set(COMPLAINT_CATALOG.map(item=>item.id)).size).toBe(107);
+  it("contains exactly 108 unique deterministic entries",()=>{
+    expect(COMPLAINT_CATALOG).toHaveLength(108);
+    expect(new Set(COMPLAINT_CATALOG.map(item=>item.id)).size).toBe(108);
     expect(COMPLAINT_CATALOG.every(item=>item.ru&&item.he&&item.category&&item.scope)).toBe(true);
   });
 

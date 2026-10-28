@@ -3,7 +3,7 @@ export type Surface = "M" | "D" | "O" | "B" | "P" | "L" | "I" | "C";
 export type ProcedureStatus = "recommended" | "planned" | "completed" | "cancelled" | "refused";
 export type ImagingStatus = "recommended" | "performed" | "reviewed" | "refused";
 export type Severity = "blocking" | "review" | "info";
-export type LabStageKind = "impressions" | "bite-registration" | "shade-selection" | "metal-try-in" | "framework-try-in" | "osseointegration-check" | "delivery" | "adjustment";
+export type LabStageKind = "impressions" | "bite-registration" | "shade-selection" | "metal-try-in" | "framework-try-in" | "pfz-framework-try-in" | "osseointegration-check" | "delivery" | "adjustment";
 
 export interface ToothState {
   number: number;
@@ -55,6 +55,10 @@ export interface Treatment {
   provider?: "self" | "external";
   jaw?: Jaw;
   quantity?: number;
+  constructionId?: string;
+  includeReplacedTeethInText?: boolean;
+  replacedTeeth?: number[];
+  followUpDays?: 3 | 7 | 14 | 30;
 }
 
 export interface Alternative {
@@ -85,7 +89,7 @@ export type PatientDecision =
 
 export interface MedicationRecord {
   id: string;
-  presetId?: "augmentin-500-125" | "augmentin-875-125" | "azithromycin-penicillin-allergy";
+  presetId?: "augmentin-500-125" | "augmentin-875-125" | "azithromycin-penicillin-allergy" | "corsodyl-gel" | "ibuprofen-prn";
   name: string;
   concentration?: string;
   dose?: string;
@@ -145,6 +149,7 @@ export interface RemovableProsthesis {
   deliveryStage: "not-planned" | "planned" | "completed" | "deferred";
   adjustmentStages: LabStage[];
   status: "proposed" | "ordered" | "in-progress" | "completed" | "remake" | "deferred";
+  includeReplacedTeethInText?: boolean;
 }
 
 export type LabConstruction = DentalBridge | RemovableProsthesis;
@@ -165,6 +170,7 @@ export interface LabOrder {
   defects: Array<"missing-vestibular-plate" | "fit" | "shade" | "occlusion" | "fracture" | "other">;
   selectedCode?: string;
   notes?: string;
+  omitPalatalPorcelain?: boolean;
 }
 
 interface ExternalDependencyBase {
@@ -212,6 +218,14 @@ export interface Imaging {
   target?: string;
   findings: string[];
   notes?: string;
+  rootFractureLocation?: "cervical" | "middle" | "apical" | "unknown";
+  rootFractureOrientation?: "horizontal" | "vertical" | "oblique" | "undetermined";
+}
+
+export interface RegionalClinicalFinding {
+  id: "retromolar-tender-fold" | "retromolar-no-inflammation";
+  region: "upper-right" | "upper-left" | "lower-right" | "lower-left";
+  clinicianConfirmed: boolean;
 }
 
 export interface Examination {
@@ -248,6 +262,7 @@ export interface ClinicalDraft {
   regionalComplaints?: ComplaintSelection[];
   generalComplaints?: ComplaintSelection[];
   consultations?: ConsultationReferral[];
+  regionalClinicalFindings?: RegionalClinicalFinding[];
   updatedAt?: string;
 }
 

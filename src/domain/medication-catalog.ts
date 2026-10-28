@@ -1,6 +1,6 @@
 import type { MedicationRecord } from "./types";
 
-export type MedicationPresetId = "augmentin-500-125" | "augmentin-875-125" | "azithromycin-penicillin-allergy";
+export type MedicationPresetId = "augmentin-500-125" | "augmentin-875-125" | "azithromycin-penicillin-allergy" | "corsodyl-gel" | "ibuprofen-prn";
 
 export interface MedicationPreset {
   id: MedicationPresetId;
@@ -10,6 +10,7 @@ export interface MedicationPreset {
   activeIngredients: string[];
   penicillinAllergyAlternative: boolean;
   requiresClinicianConfirmation: boolean;
+  status?: MedicationRecord["status"];
 }
 
 export const MEDICATION_PRESETS: readonly MedicationPreset[] = [
@@ -40,6 +41,8 @@ export const MEDICATION_PRESETS: readonly MedicationPreset[] = [
     penicillinAllergyAlternative: true,
     requiresClinicianConfirmation: true,
   },
+  {id:"corsodyl-gel",label:"Corsodyl gel — рекомендация без дозировки",name:"Corsodyl gel",concentration:"",activeIngredients:["chlorhexidine"],penicillinAllergyAlternative:false,requiresClinicianConfirmation:false,status:"recommended"},
+  {id:"ibuprofen-prn",label:"Ибупрофен при боли — без дозировки",name:"Ibuprofen",concentration:"",activeIngredients:["ibuprofen"],penicillinAllergyAlternative:false,requiresClinicianConfirmation:false,status:"recommended"},
 ] as const;
 
 export function medicationPreset(id: MedicationPresetId): MedicationPreset {
@@ -56,7 +59,7 @@ export function medicationFromPreset(id: MedicationPresetId, recordId: string): 
     name: preset.name,
     ...(preset.concentration ? { concentration: preset.concentration } : {}),
     allergyCheck: preset.penicillinAllergyAlternative ? "allergy-present" : "not-checked",
-    status: "prescribed",
+    status: preset.status??"prescribed",
     penicillinAllergyAlternative: preset.penicillinAllergyAlternative,
     clinicianSelectionConfirmed: !preset.requiresClinicianConfirmation,
   };

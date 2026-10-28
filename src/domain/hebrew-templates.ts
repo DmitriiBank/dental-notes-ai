@@ -1,43 +1,22 @@
-import type { Alternative, ClinicalDraft, Imaging, ToothState, Treatment } from "./types";
+import type { Alternative, ClinicalDraft, Imaging, Treatment } from "./types";
 import {
   HEBREW_FINDINGS,
   HEBREW_TREATMENTS,
   IMAGING_LABELS,
   IMAGING_STATUS,
-  SYMPTOM_HEBREW,
   TREATMENT_STATUS,
   hebrewList,
   phrase,
 } from "./hebrew-catalog";
 import { groupFirstAidSelections } from "./first-aid-catalog";
-import { completedLabStageText, dependencyText, labConstructionText, labOrderRemakeText, medicationSafetyText, medicationText, patientDecisionText } from "./structured-clinical-text";
+import { completedLabStageText, dependencyText, labConstructionText, labOrderInstructionText, labOrderRemakeText, medicationSafetyText, medicationText, patientDecisionText } from "./structured-clinical-text";
 import { complaintSentences } from "./complaint-catalog";
 import { consultationText } from "./consultation-catalog";
+import { aggregateClinicalFindings, toothSpecificClinicalDetails } from "./clinical-presentation";
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const sentence = (value: string) => `${value.trim().replace(/[.;]+$/u, "")}.`;
 const cleanOutput = (value: string) => value.replace(/[“”]/gu, '"').replace(/[ \t]+\n/gu, "\n").trim();
-
-function toothFindingSentence(tooth: ToothState): string | null {
-  if (tooth.missing) return null;
-  const findings = unique(tooth.findings).map(key => phrase(HEBREW_FINDINGS, key));
-  const symptoms = unique(tooth.symptoms).map(key => SYMPTOM_HEBREW[key] ?? key);
-  if (!findings.length && !symptoms.length && !tooth.notes) return null;
-
-  const parts: string[] = [];
-  if (findings.length) parts.push(hebrewList(findings));
-  if (tooth.surfaces.length && tooth.findings.some(key => key.includes("caries"))) {
-    parts.push(`במשטחים ${unique(tooth.surfaces).join(",")}`);
-  }
-  if (symptoms.length) parts.push(`לפי דיווח המטופל: ${hebrewList(symptoms)}`);
-  if (tooth.notes) parts.push(tooth.notes);
-
-  let result = `שן ${tooth.number}: ${parts.join("; ")}`;
-  if (tooth.findings.includes("deep-caries")) {
-    result += "; ייתכן צורך בטיפול שורש בהתאם למצב המוך ולממצאים במהלך הטיפול, ללא אבחנה אנדודונטית סופית בשלב זה";
-  }
-  return sentence(result);
-}
 
 function imagingSentence(imaging: Imaging): string {
   const label = IMAGING_LABELS[imaging.kind] ?? imaging.kind;
@@ -45,13 +24,16 @@ function imagingSentence(imaging: Imaging): string {
   if (imaging.status === "refused") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}`);
   if (imaging.status !== "reviewed") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}`);
   const findingText = unique(imaging.findings).map(key => phrase(HEBREW_FINDINGS, key));
-  const details = [hebrewList(findingText), imaging.notes].filter(Boolean).join("; ");
+  const fractureDetails=imaging.findings.some(key=>key==="root-fracture-suspected"||key==="root-fracture-observed")
+    ? [imaging.rootFractureLocation&&imaging.rootFractureLocation!=="unknown"?`מיקום ${imaging.rootFractureLocation}`:"",imaging.rootFractureOrientation&&imaging.rootFractureOrientation!=="undetermined"?`כיוון ${imaging.rootFractureOrientation}`:""].filter(Boolean).join(", ")
+    : "";
+  const details = [hebrewList(findingText),fractureDetails, imaging.notes].filter(Boolean).join("; ");
   return sentence(`${label}${target} נבדק${details ? `: ${details}` : ""}`);
 }
 
 function treatmentText(treatment: Treatment): string {
   const target = treatment.tooth ? `בשן ${treatment.tooth} ` : treatment.jaw === "upper" ? "ללסת העליונה " : treatment.jaw === "lower" ? "ללסת התחתונה " : "";
-  const details = [treatment.material ? `חומר ${treatment.material}` : "", treatment.shade ? `גוון ${treatment.shade}` : ""].filter(Boolean);
+  const details = [treatment.surfaces?.length?`משטחים ${unique(treatment.surfaces).join("")}`:"",treatment.material ? `חומר ${treatment.material}` : "", treatment.shade ? `גוון ${treatment.shade}` : "",treatment.followUpDays?`בעוד ${treatment.followUpDays} ימים`:""].filter(Boolean);
   return `${target}${phrase(HEBREW_TREATMENTS, treatment.kind)}${details.length ? `, ${details.join(", ")}` : ""}`;
 }
 
@@ -64,17 +46,21 @@ const treatmentGroupKey = (treatment: Treatment) => JSON.stringify({
   provider: treatment.provider ?? "self",
   jaw: treatment.jaw ?? "",
   stage: treatment.stage ?? null,
+  buccalOnly:treatment.buccalOnly??false,
+  followUpDays:treatment.followUpDays??null,
 });
+
+const DENTURE_TREATMENTS=new Set(["complete-denture","partial-denture","immediate-denture","overdenture"]);
 
 function groupTreatments(treatments: Treatment[]): Treatment[][] {
   const groups = new Map<string, Treatment[]>();
   const standalone: Treatment[][] = [];
   treatments.forEach(treatment => {
-    if (treatment.tooth === undefined) {
+    if (treatment.tooth === undefined && !DENTURE_TREATMENTS.has(treatment.kind)) {
       standalone.push([treatment]);
       return;
     }
-    const key = treatmentGroupKey(treatment);
+    const key = DENTURE_TREATMENTS.has(treatment.kind)?treatmentGroupKey({...treatment,jaw:undefined}):treatmentGroupKey(treatment);
     groups.set(key, [...(groups.get(key) ?? []), treatment]);
   });
   return [...groups.values(), ...standalone];
@@ -82,13 +68,21 @@ function groupTreatments(treatments: Treatment[]): Treatment[][] {
 
 function groupedTreatmentText(group: Treatment[]): string {
   const treatment = group[0];
+  if(DENTURE_TREATMENTS.has(treatment.kind)){
+    const jaws=unique(group.map(item=>item.jaw).filter((jaw):jaw is "upper"|"lower"=>Boolean(jaw)));
+    const label=phrase(HEBREW_TREATMENTS,treatment.kind);
+    const target=jaws.length===2&&treatment.kind==="complete-denture"?"תותבות שלמות נשלפות ללסת העליונה וללסת התחתונה":`${label} ${jaws[0]==="upper"?"ללסת העליונה":jaws[0]==="lower"?"ללסת התחתונה":""}`.trim();
+    const replacements=treatment.kind==="partial-denture"&&treatment.includeReplacedTeethInText&&treatment.replacedTeeth?.length?`שיניים להשלמה ${hebrewList(treatment.replacedTeeth.map(String))}`:"";
+    return [target,replacements,treatment.material?`חומר ${treatment.material}`:""].filter(Boolean).join(", ");
+  }
   const teeth = unique(group.map(item => item.tooth).filter((tooth): tooth is number => tooth !== undefined)).sort((a, b) => a - b);
   if (teeth.length <= 1) return treatmentText(treatment);
-  const details = [treatment.material ? `חומר ${treatment.material}` : "", treatment.shade ? `גוון ${treatment.shade}` : ""].filter(Boolean);
+  const surfaceTargets=group.map(item=>item.tooth===undefined?"":`${item.tooth}${item.surfaces?.length?` (${unique(item.surfaces).join("")})`:""}`).filter(Boolean);
+  const details = [treatment.material ? `חומר ${treatment.material}` : "", treatment.shade ? `גוון ${treatment.shade}` : "",treatment.followUpDays?`בעוד ${treatment.followUpDays} ימים`:""].filter(Boolean);
   const procedure = phrase(HEBREW_TREATMENTS, treatment.kind);
   const target = BRIDGE_TREATMENTS.has(treatment.kind)
     ? `${procedure} משן ${teeth[0]} עד שן ${teeth.at(-1)}`
-    : `${procedure} בשיניים ${hebrewList(teeth.map(String))}`;
+    : `${procedure} בשיניים ${hebrewList(surfaceTargets)}`;
   return `${target}${details.length ? `, ${details.join(", ")}` : ""}`;
 }
 
@@ -127,7 +121,9 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   const clinicalFindings: string[] = [];
   if (draft.edentulous.includes("upper")) clinicalFindings.push("חוסר שיניים מלא בלסת העליונה.");
   if (draft.edentulous.includes("lower")) clinicalFindings.push("חוסר שיניים מלא בלסת התחתונה.");
-  Object.values(draft.teeth).map(toothFindingSentence).filter((value): value is string => Boolean(value)).forEach(value => clinicalFindings.push(value));
+  aggregateClinicalFindings(draft).forEach(group=>clinicalFindings.push(group.text));
+  clinicalFindings.push(...toothSpecificClinicalDetails(draft));
+  (draft.regionalClinicalFindings??[]).filter(item=>item.clinicianConfirmed).forEach(item=>clinicalFindings.push(sentence(`${item.region==="lower-left"?"באזור הרטרומולרי השמאלי התחתון":item.region==="lower-right"?"באזור הרטרומולרי הימני התחתון":item.region==="upper-left"?"באזור הרטרומולרי השמאלי העליון":"באזור הרטרומולרי הימני העליון"}: ${item.id==="retromolar-tender-fold"?"קפל רירית רגיש במישוש":"לא נצפו סימני דלקת"}`)));
   const missing = Object.values(draft.teeth).filter(tooth => tooth.missing).map(tooth => String(tooth.number));
   if (missing.length && !draft.edentulous.length) clinicalFindings.push(sentence(`שיניים ${hebrewList(missing)} חסרות`));
   const recommendedDetails=examination.details.filter(detail=>/^הומלץ/u.test(detail.trim()));
@@ -159,6 +155,7 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   draft.alternatives.map(alternativeText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
   (draft.labConstructions ?? []).map(labConstructionText).forEach(value => plan.push(value));
   (draft.labOrders ?? []).map(labOrderRemakeText).filter((value): value is string => Boolean(value)).forEach(value=>plan.push(value));
+  (draft.labOrders ?? []).map(labOrderInstructionText).filter((value): value is string => Boolean(value)).forEach(value=>plan.push(value));
   (draft.externalProcedureDependencies ?? []).map(dependencyText).forEach(value=>plan.push(value));
   (draft.patientDecisions ?? []).map(patientDecisionText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
   plan.push(...(firstAid.get("recommendation") ?? []), ...(firstAid.get("counseling") ?? []));

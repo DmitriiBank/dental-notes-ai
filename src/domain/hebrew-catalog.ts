@@ -48,6 +48,9 @@ export const HEBREW_FINDINGS: Record<string, HebrewPhrase> = {
   "apical-root-resorption": { label: "ספיגה אפיקלית של השורש" },
   "lateral-radiolucency": { label: "הצללה רדיולוצנטית לטרלית לשורש" },
   "furcation-radiolucency": { label: "הצללה רדיולוצנטית באזור הפורקציה" },
+  "root-fracture-suspected": { label: "חשד לשבר בשורש על פי הממצא הרדיוגרפי" },
+  "root-fracture-observed": { label: "ממצא רדיוגרפי התואם שבר בשורש" },
+  "no-radiographic-pathology-seen": { label: "לא הודגם ממצא פתולוגי בצילום הנבדק" },
   "underfilled-canals": { label: "מילוי תעלות המסתיים לפני האפקס" },
   "overfilled-canals": { label: "חומר מילוי תעלות מעבר לאפקס" },
   "separated-instrument": { label: "קטע מכשיר בתעלה" },
@@ -69,6 +72,10 @@ export const HEBREW_FINDINGS: Record<string, HebrewPhrase> = {
   "peri-implant-inflammation": { label: "דלקת סביב השתל" },
   "peri-implant-bone-loss": { label: "אובדן עצם סביב השתל" },
   "implant-missing": { label: "שתל חסר או הוסר" },
+  intact: { label: "ללא ממצא פתולוגי בבדיקה הקלינית" },
+  "short-roots": { label: "שורשים קצרים" },
+  "deep-cervical-lesion": { label: "נגע צווארי עמוק" },
+  "poor-prognosis": { label: "פרוגנוזה בלתי טובה לפי הערכת הרופא" },
 };
 
 export const HEBREW_TREATMENTS: Record<string, HebrewPhrase> = {
@@ -102,6 +109,7 @@ export const HEBREW_TREATMENTS: Record<string, HebrewPhrase> = {
   relining: { label: "ריפוד תותבת" },
   "denture-adjustment": { label: "התאמת תותבת" },
   "denture-remake": { label: "הכנת תותבת מחדש" },
+  "follow-up": { label: "ביקורת" },
   extraction: { label: "עקירה אצל רופא אחר" },
   "surgical-extraction": { label: "עקירה כירורגית אצל רופא אחר" },
   "implant-placement": { label: "השתלת שתל אצל רופא מתאים" },

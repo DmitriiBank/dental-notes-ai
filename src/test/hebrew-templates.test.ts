@@ -26,7 +26,8 @@ describe("Hebrew grammar and deterministic clinical composition", () => {
     draft.teeth[12].findings = ["recession"];
     draft.teeth[12].symptoms = ["Холод"];
     const output = generateHebrewRecord(draft);
-    expect(output).toContain("נסיגת חניכיים; לפי דיווח המטופל: רגישות לקור");
+    expect(output).toContain("נסיגת חניכיים בשן 12");
+    expect(output).toContain("לפי דיווח המטופל: רגישות לקור");
   });
 
   it("separates completed procedures from proposed treatment", () => {

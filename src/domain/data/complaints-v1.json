@@ -700,6 +700,13 @@
       "patientReported": true
     },
     {
+      "id": "general.return-after-imaging-for-diagnosis-and-plan",
+      "category": "aesthetic",
+      "labelRu": "Вернулся после снимков для уточнения диагноза и составления плана лечения",
+      "phraseHe": "המטופל הגיע לאחר ביצוע צילומים לצורך השלמת הבירור האבחנתי ובניית תוכנית טיפול",
+      "patientReported": true
+    },
+    {
       "id": "referral",
       "category": "aesthetic",
       "labelRu": "Пришёл по направлению",

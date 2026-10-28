@@ -9,6 +9,7 @@ export const FINDINGS = [
   ["furcation", "Вовлечение фуркации"], ["treated-canals", "Ранее леченные каналы"], ["incomplete-rct", "Неполная обтурация каналов"], ["suspected-endo", "Подозрение на эндодонтическую патологию"],
   ["periapical", "Периапикальное просветление"], ["lateral-radiolucency", "Латеральное просветление"], ["furcation-radiolucency", "Просветление в фуркации"], ["fistula", "Свищ"], ["swelling", "Отек"],
   ["impacted", "Ретинированный зуб"], ["partially-impacted", "Частично ретинированный"], ["dystopic", "Дистопия"], ["buccal", "Щечное положение"], ["soft-tissue-trauma", "Травма мягких тканей зубом"]
+  ,["intact", "Клинически интактный зуб"], ["short-roots", "Короткие корни"], ["deep-cervical-lesion", "Глубокое пришеечное поражение"], ["poor-prognosis", "Неблагоприятный прогноз (подтвержден врачом)"]
 ] as const;
 
 export const TREATMENTS = [

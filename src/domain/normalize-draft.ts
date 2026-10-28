@@ -18,6 +18,7 @@ export function normalizeDraft(input: ClinicalDraft): ClinicalDraft {
   draft.regionalComplaints ??= [];
   draft.generalComplaints ??= [];
   draft.consultations ??= [];
+  draft.regionalClinicalFindings ??= [];
   const migrateTreatment=(treatment:ClinicalDraft["generalTreatments"][number])=>{const type=legacyConsultations[treatment.kind];if(!type)return false;if(!draft.consultations!.some(item=>item.id===treatment.id))draft.consultations!.push({id:treatment.id,type,target:treatment.tooth?{kind:"teeth",teeth:[treatment.tooth]}:treatment.jaw?{kind:"jaw",jaw:treatment.jaw}:{kind:"plan"},reasons:[],status:treatment.status==="planned"?"scheduled":treatment.status==="completed"?"completed":treatment.status==="refused"||treatment.status==="cancelled"?"refused":"recommended",completionConfirmed:treatment.status==="completed"});return true};
   Object.values(draft.teeth).forEach(tooth=>{tooth.treatments=tooth.treatments.filter(treatment=>!migrateTreatment(treatment))});
   draft.generalTreatments=draft.generalTreatments.filter(treatment=>!migrateTreatment(treatment));
