@@ -12,6 +12,7 @@ import {
 import { groupFirstAidSelections } from "./first-aid-catalog";
 import { completedLabStageText, dependencyText, labConstructionText, labOrderRemakeText, medicationSafetyText, medicationText, patientDecisionText } from "./structured-clinical-text";
 import { complaintSentences } from "./complaint-catalog";
+import { consultationText } from "./consultation-catalog";
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const sentence = (value: string) => `${value.trim().replace(/[.;]+$/u, "")}.`;
@@ -41,7 +42,7 @@ function toothFindingSentence(tooth: ToothState): string | null {
 function imagingSentence(imaging: Imaging): string {
   const label = IMAGING_LABELS[imaging.kind] ?? imaging.kind;
   const target = imaging.target ? ` עבור ${imaging.target}` : "";
-  if (imaging.status === "refused") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}; הוסבר כי ללא הבדיקה יכולת האבחון מוגבלת`);
+  if (imaging.status === "refused") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}`);
   if (imaging.status !== "reviewed") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}`);
   const findingText = unique(imaging.findings).map(key => phrase(HEBREW_FINDINGS, key));
   const details = [hebrewList(findingText), imaging.notes].filter(Boolean).join("; ");
@@ -151,6 +152,7 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   draft.imaging.filter(imaging=>imaging.status==="recommended").map(imagingSentence).forEach(value=>plan.push(value));
   recommendedDetails.map(sentence).forEach(value=>plan.push(value));
   recommendedMedicationLines.forEach(value=>plan.push(value));
+  (draft.consultations??[]).map(consultationText).filter((value):value is string=>Boolean(value)).forEach(value=>plan.push(value));
   groupTreatments(allTreatments.filter(treatment => treatment.status !== "completed" && treatment.status !== "cancelled")).forEach(group => {
     plan.push(`${TREATMENT_STATUS[group[0].status]} ${groupedTreatmentText(group)}`);
   });

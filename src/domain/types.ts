@@ -21,11 +21,20 @@ export type ComplaintTrigger = "spontaneous" | "cold" | "hot" | "biting" | "swee
 export type ComplaintSeverity = "mild" | "moderate" | "severe";
 export interface ComplaintSelection {
   complaintId: string;
-  onset?: ComplaintOnset;
-  trigger?: ComplaintTrigger;
-  severity?: ComplaintSeverity;
+  onset?: ComplaintOnset | string;
+  trigger?: ComplaintTrigger | string;
+  severity?: ComplaintSeverity | string;
+  intensity?: string;
+  pattern?: string;
+  triggers?: string[];
+  patientGoal?: string;
   region?: string;
 }
+
+export type ConsultationType="prosthodontic-consultant"|"restorative-dentist"|"implantologist"|"periodontist"|"endodontist"|"oral-maxillofacial-surgeon"|"oral-medicine-specialist"|"orthodontist"|"hygienist";
+export type ConsultationReason="implant-planning"|"questionable-restorability"|"endodontic-pathology"|"periodontal-evaluation"|"complex-prosthetic-rehabilitation"|"second-opinion";
+export type ConsultationTarget={kind:"teeth";teeth:number[]}|{kind:"jaw";jaw:Jaw}|{kind:"plan"};
+export interface ConsultationReferral {id:string;type:ConsultationType;target:ConsultationTarget;reasons:ConsultationReason[];status:"recommended"|"scheduled"|"completed"|"refused";completionConfirmed:boolean}
 
 export interface ImplantState {
   id: string;
@@ -238,6 +247,7 @@ export interface ClinicalDraft {
   mentorChecklists?: MentorChecklist[];
   regionalComplaints?: ComplaintSelection[];
   generalComplaints?: ComplaintSelection[];
+  consultations?: ConsultationReferral[];
   updatedAt?: string;
 }
 

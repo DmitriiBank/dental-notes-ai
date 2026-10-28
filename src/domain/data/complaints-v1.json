@@ -1,0 +1,975 @@
+{
+  "schemaVersion": "1.0",
+  "categories": {
+    "pain": "Боль",
+    "sensitivity": "Чувствительность",
+    "crown_bridge": "Коронки и мосты",
+    "filling_fracture": "Пломбы и разрушение зуба",
+    "gum_soft": "Дёсны и слизистая",
+    "removable": "Съёмные протезы",
+    "implant": "Импланты",
+    "functional": "Функция и прикус",
+    "aesthetic": "Эстетика и обращения без боли",
+    "trauma_emergency": "Травмы и первая помощь"
+  },
+  "complaints": [
+    {
+      "id": "tooth-pain",
+      "category": "pain",
+      "labelRu": "Зубная боль",
+      "phraseHe": "כאב בשן",
+      "patientReported": true
+    },
+    {
+      "id": "jaw-pain",
+      "category": "pain",
+      "labelRu": "Боль в челюсти",
+      "phraseHe": "כאב בלסת",
+      "patientReported": true
+    },
+    {
+      "id": "gum-pain",
+      "category": "pain",
+      "labelRu": "Боль в десне",
+      "phraseHe": "כאב בחניכיים",
+      "patientReported": true
+    },
+    {
+      "id": "bite-pain",
+      "category": "pain",
+      "labelRu": "Боль при накусывании",
+      "phraseHe": "כאב בעת נשיכה",
+      "patientReported": true
+    },
+    {
+      "id": "chew-pain",
+      "category": "pain",
+      "labelRu": "Боль при жевании",
+      "phraseHe": "כאב בזמן לעיסה",
+      "patientReported": true
+    },
+    {
+      "id": "spontaneous-pain",
+      "category": "pain",
+      "labelRu": "Самопроизвольная боль",
+      "phraseHe": "כאב ספונטני",
+      "patientReported": true
+    },
+    {
+      "id": "night-pain",
+      "category": "pain",
+      "labelRu": "Ночная боль",
+      "phraseHe": "כאב בשעות הלילה",
+      "patientReported": true
+    },
+    {
+      "id": "throbbing-pain",
+      "category": "pain",
+      "labelRu": "Пульсирующая боль",
+      "phraseHe": "כאב פועם",
+      "patientReported": true
+    },
+    {
+      "id": "sharp-pain",
+      "category": "pain",
+      "labelRu": "Острая боль",
+      "phraseHe": "כאב חד",
+      "patientReported": true
+    },
+    {
+      "id": "dull-pain",
+      "category": "pain",
+      "labelRu": "Ноющая боль",
+      "phraseHe": "כאב עמום",
+      "patientReported": true
+    },
+    {
+      "id": "intermittent-pain",
+      "category": "pain",
+      "labelRu": "Периодическая боль",
+      "phraseHe": "כאב לסירוגין",
+      "patientReported": true
+    },
+    {
+      "id": "continuous-pain",
+      "category": "pain",
+      "labelRu": "Постоянная боль",
+      "phraseHe": "כאב מתמשך",
+      "patientReported": true
+    },
+    {
+      "id": "post-treatment-pain",
+      "category": "pain",
+      "labelRu": "Боль после лечения",
+      "phraseHe": "כאב לאחר טיפול",
+      "patientReported": true
+    },
+    {
+      "id": "pain-under-crown",
+      "category": "pain",
+      "labelRu": "Боль под коронкой",
+      "phraseHe": "כאב באזור שן המשוקמת בכתר",
+      "patientReported": true
+    },
+    {
+      "id": "pain-under-denture",
+      "category": "pain",
+      "labelRu": "Боль под протезом",
+      "phraseHe": "כאב מתחת לתותבת",
+      "patientReported": true
+    },
+    {
+      "id": "implant-area-pain",
+      "category": "pain",
+      "labelRu": "Боль в области импланта",
+      "phraseHe": "כאב באזור שתל",
+      "patientReported": true
+    },
+    {
+      "id": "wisdom-area-pain",
+      "category": "pain",
+      "labelRu": "Боль в области зуба мудрости",
+      "phraseHe": "כאב באזור שן בינה",
+      "patientReported": true
+    },
+    {
+      "id": "pain-on-touch",
+      "category": "pain",
+      "labelRu": "Боль при прикосновении",
+      "phraseHe": "כאב במגע",
+      "patientReported": true
+    },
+    {
+      "id": "pain-on-opening",
+      "category": "pain",
+      "labelRu": "Боль при открывании рта",
+      "phraseHe": "כאב בפתיחת הפה",
+      "patientReported": true
+    },
+    {
+      "id": "cold",
+      "category": "sensitivity",
+      "labelRu": "На холодное",
+      "phraseHe": "רגישות לקור",
+      "patientReported": true
+    },
+    {
+      "id": "heat",
+      "category": "sensitivity",
+      "labelRu": "На горячее",
+      "phraseHe": "רגישות לחום",
+      "patientReported": true
+    },
+    {
+      "id": "sweet",
+      "category": "sensitivity",
+      "labelRu": "На сладкое",
+      "phraseHe": "רגישות למתוק",
+      "patientReported": true
+    },
+    {
+      "id": "sour",
+      "category": "sensitivity",
+      "labelRu": "На кислое",
+      "phraseHe": "רגישות לחמוץ",
+      "patientReported": true
+    },
+    {
+      "id": "air",
+      "category": "sensitivity",
+      "labelRu": "На воздух",
+      "phraseHe": "רגישות לאוויר",
+      "patientReported": true
+    },
+    {
+      "id": "brushing",
+      "category": "sensitivity",
+      "labelRu": "При чистке",
+      "phraseHe": "רגישות בזמן צחצוח",
+      "patientReported": true
+    },
+    {
+      "id": "touch",
+      "category": "sensitivity",
+      "labelRu": "При касании",
+      "phraseHe": "רגישות במגע",
+      "patientReported": true
+    },
+    {
+      "id": "after-filling",
+      "category": "sensitivity",
+      "labelRu": "После пломбы",
+      "phraseHe": "רגישות לאחר שחזור",
+      "patientReported": true
+    },
+    {
+      "id": "generalized-sensitivity",
+      "category": "sensitivity",
+      "labelRu": "Несколько зубов",
+      "phraseHe": "רגישות במספר שיניים",
+      "patientReported": true
+    },
+    {
+      "id": "exposed-neck",
+      "category": "sensitivity",
+      "labelRu": "В области шеек",
+      "phraseHe": "רגישות באזור צווארי השיניים",
+      "patientReported": true
+    },
+    {
+      "id": "crown-loose",
+      "category": "crown_bridge",
+      "labelRu": "Коронка шатается",
+      "phraseHe": "ניידות של כתר",
+      "patientReported": true
+    },
+    {
+      "id": "crown-off",
+      "category": "crown_bridge",
+      "labelRu": "Коронка выпала",
+      "phraseHe": "השתחררות של כתר",
+      "patientReported": true
+    },
+    {
+      "id": "bridge-loose",
+      "category": "crown_bridge",
+      "labelRu": "Мост шатается",
+      "phraseHe": "ניידות של גשר",
+      "patientReported": true
+    },
+    {
+      "id": "bridge-off",
+      "category": "crown_bridge",
+      "labelRu": "Мост расфиксировался",
+      "phraseHe": "השתחררות של גשר",
+      "patientReported": true
+    },
+    {
+      "id": "crown-fracture",
+      "category": "crown_bridge",
+      "labelRu": "Скол коронки",
+      "phraseHe": "שבר בכתר",
+      "patientReported": true
+    },
+    {
+      "id": "bridge-fracture",
+      "category": "crown_bridge",
+      "labelRu": "Поломка моста",
+      "phraseHe": "שבר בגשר",
+      "patientReported": true
+    },
+    {
+      "id": "crown-high",
+      "category": "crown_bridge",
+      "labelRu": "Коронка мешает смыканию",
+      "phraseHe": "מגע מוקדם באזור הכתר לפי דיווח המטופל",
+      "patientReported": true
+    },
+    {
+      "id": "crown-food",
+      "category": "crown_bridge",
+      "labelRu": "Еда застревает у коронки",
+      "phraseHe": "דחיסת מזון באזור הכתר",
+      "patientReported": true
+    },
+    {
+      "id": "crown-aesthetic",
+      "category": "crown_bridge",
+      "labelRu": "Не устраивает вид коронки",
+      "phraseHe": "אי שביעות רצון ממראה הכתר",
+      "patientReported": true
+    },
+    {
+      "id": "crown-odor",
+      "category": "crown_bridge",
+      "labelRu": "Неприятный запах у коронки",
+      "phraseHe": "ריח לא נעים באזור הכתר",
+      "patientReported": true
+    },
+    {
+      "id": "temp-crown-off",
+      "category": "crown_bridge",
+      "labelRu": "Выпала временная коронка",
+      "phraseHe": "השתחררות של כתר זמני",
+      "patientReported": true
+    },
+    {
+      "id": "filling-chipped",
+      "category": "filling_fracture",
+      "labelRu": "Скол старой пломбы",
+      "phraseHe": "שבר בשחזור קיים",
+      "patientReported": true
+    },
+    {
+      "id": "filling-lost",
+      "category": "filling_fracture",
+      "labelRu": "Выпала пломба",
+      "phraseHe": "נפילת שחזור",
+      "patientReported": true
+    },
+    {
+      "id": "tooth-chipped",
+      "category": "filling_fracture",
+      "labelRu": "Откололся кусочек зуба",
+      "phraseHe": "שבר בחלק מכותרת השן",
+      "patientReported": true
+    },
+    {
+      "id": "tooth-hole",
+      "category": "filling_fracture",
+      "labelRu": "Ощущает полость в зубе",
+      "phraseHe": "תחושת חור בשן",
+      "patientReported": true
+    },
+    {
+      "id": "sharp-edge",
+      "category": "filling_fracture",
+      "labelRu": "Острый край зуба / пломбы",
+      "phraseHe": "קצה חד של שן או שחזור",
+      "patientReported": true
+    },
+    {
+      "id": "food-trap",
+      "category": "filling_fracture",
+      "labelRu": "Застревает пища",
+      "phraseHe": "דחיסת מזון בין השיניים",
+      "patientReported": true
+    },
+    {
+      "id": "broken-tooth",
+      "category": "filling_fracture",
+      "labelRu": "Сломался зуб",
+      "phraseHe": "שבר בשן",
+      "patientReported": true
+    },
+    {
+      "id": "filling-high",
+      "category": "filling_fracture",
+      "labelRu": "Пломба мешает смыканию",
+      "phraseHe": "תחושת גובה בשחזור",
+      "patientReported": true
+    },
+    {
+      "id": "restoration-discolor",
+      "category": "filling_fracture",
+      "labelRu": "Изменение цвета пломбы",
+      "phraseHe": "שינוי צבע בשחזור",
+      "patientReported": true
+    },
+    {
+      "id": "bleeding-gum",
+      "category": "gum_soft",
+      "labelRu": "Кровоточат дёсны",
+      "phraseHe": "דימום מהחניכיים",
+      "patientReported": true
+    },
+    {
+      "id": "gum-swelling",
+      "category": "gum_soft",
+      "labelRu": "Опухла десна",
+      "phraseHe": "נפיחות בחניכיים",
+      "patientReported": true
+    },
+    {
+      "id": "face-swelling",
+      "category": "gum_soft",
+      "labelRu": "Отёк лица",
+      "phraseHe": "נפיחות בפנים",
+      "patientReported": true
+    },
+    {
+      "id": "pus",
+      "category": "gum_soft",
+      "labelRu": "Выделение гноя",
+      "phraseHe": "הפרשה מוגלתית לפי דיווח המטופל",
+      "patientReported": true
+    },
+    {
+      "id": "fistula",
+      "category": "gum_soft",
+      "labelRu": "Прыщик на десне",
+      "phraseHe": "פצעון בחניכיים לפי דיווח המטופל",
+      "patientReported": true
+    },
+    {
+      "id": "recession",
+      "category": "gum_soft",
+      "labelRu": "Оголяются шейки зубов",
+      "phraseHe": "חשיפת צווארי שיניים לפי דיווח המטופל",
+      "patientReported": true
+    },
+    {
+      "id": "mouth-ulcer",
+      "category": "gum_soft",
+      "labelRu": "Ранка во рту",
+      "phraseHe": "פצע ברירית הפה",
+      "patientReported": true
+    },
+    {
+      "id": "trauma-cheek",
+      "category": "gum_soft",
+      "labelRu": "Зуб травмирует щёку",
+      "phraseHe": "שן הפוצעת את רירית הלחי",
+      "patientReported": true
+    },
+    {
+      "id": "trauma-tongue",
+      "category": "gum_soft",
+      "labelRu": "Зуб травмирует язык",
+      "phraseHe": "שן הפוצעת את הלשון",
+      "patientReported": true
+    },
+    {
+      "id": "burning-mouth",
+      "category": "gum_soft",
+      "labelRu": "Жжение во рту",
+      "phraseHe": "תחושת צריבה בחלל הפה",
+      "patientReported": true
+    },
+    {
+      "id": "dry-mouth",
+      "category": "gum_soft",
+      "labelRu": "Сухость во рту",
+      "phraseHe": "יובש בפה",
+      "patientReported": true
+    },
+    {
+      "id": "bad-breath",
+      "category": "gum_soft",
+      "labelRu": "Неприятный запах изо рта",
+      "phraseHe": "ריח רע מהפה",
+      "patientReported": true
+    },
+    {
+      "id": "bad-taste",
+      "category": "gum_soft",
+      "labelRu": "Неприятный вкус",
+      "phraseHe": "טעם לא נעים בפה",
+      "patientReported": true
+    },
+    {
+      "id": "denture-pain",
+      "category": "removable",
+      "labelRu": "Протез натирает / болит",
+      "phraseHe": "כאב ושפשוף מתותבת",
+      "patientReported": true
+    },
+    {
+      "id": "denture-loose",
+      "category": "removable",
+      "labelRu": "Протез плохо держится",
+      "phraseHe": "חוסר יציבות של התותבת",
+      "patientReported": true
+    },
+    {
+      "id": "denture-broken",
+      "category": "removable",
+      "labelRu": "Протез сломался",
+      "phraseHe": "שבר בתותבת",
+      "patientReported": true
+    },
+    {
+      "id": "denture-clasp",
+      "category": "removable",
+      "labelRu": "Сломался кламмер",
+      "phraseHe": "שבר בוו של התותבת",
+      "patientReported": true
+    },
+    {
+      "id": "denture-pressure",
+      "category": "removable",
+      "labelRu": "Протез давит",
+      "phraseHe": "תחושת לחץ מהתותבת",
+      "patientReported": true
+    },
+    {
+      "id": "denture-sore",
+      "category": "removable",
+      "labelRu": "Ранки под протезом",
+      "phraseHe": "פצעים מתחת לתותבת לפי דיווח המטופל",
+      "patientReported": true
+    },
+    {
+      "id": "denture-chew",
+      "category": "removable",
+      "labelRu": "Трудно жевать с протезом",
+      "phraseHe": "קושי בלעיסה עם תותבת",
+      "patientReported": true
+    },
+    {
+      "id": "denture-adjust",
+      "category": "removable",
+      "labelRu": "Просит коррекцию протеза",
+      "phraseHe": "בקשה להתאמת תותבת",
+      "patientReported": true
+    },
+    {
+      "id": "denture-remake",
+      "category": "removable",
+      "labelRu": "Просит переделать протез",
+      "phraseHe": "בקשה להכנת תותבת חדשה",
+      "patientReported": true
+    },
+    {
+      "id": "implant-denture-loose",
+      "category": "removable",
+      "labelRu": "Протез на имплантах не держится",
+      "phraseHe": "חוסר יציבות של תותבת נתמכת שתלים",
+      "patientReported": true
+    },
+    {
+      "id": "implant-crown-loose",
+      "category": "implant",
+      "labelRu": "Подвижность коронки на импланте",
+      "phraseHe": "ניידות כתר על גבי שתל",
+      "patientReported": true
+    },
+    {
+      "id": "implant-prosthesis-loose",
+      "category": "implant",
+      "labelRu": "Подвижность конструкции на имплантах",
+      "phraseHe": "ניידות שיקום על גבי שתלים",
+      "patientReported": true
+    },
+    {
+      "id": "implant-area-swelling",
+      "category": "implant",
+      "labelRu": "Отёк вокруг импланта",
+      "phraseHe": "נפיחות באזור השתל",
+      "patientReported": true
+    },
+    {
+      "id": "implant-bleeding",
+      "category": "implant",
+      "labelRu": "Кровотечение вокруг импланта",
+      "phraseHe": "דימום באזור השתל",
+      "patientReported": true
+    },
+    {
+      "id": "implant-food",
+      "category": "implant",
+      "labelRu": "Застревает пища вокруг импланта",
+      "phraseHe": "דחיסת מזון באזור השתל",
+      "patientReported": true
+    },
+    {
+      "id": "implant-followup",
+      "category": "implant",
+      "labelRu": "Просит проверку импланта",
+      "phraseHe": "בקשה לבדיקת שתל",
+      "patientReported": true
+    },
+    {
+      "id": "jaw-click",
+      "category": "functional",
+      "labelRu": "Щелчки в суставе",
+      "phraseHe": "קליקים במפרק הלסת",
+      "patientReported": true
+    },
+    {
+      "id": "jaw-lock",
+      "category": "functional",
+      "labelRu": "Заклинивание челюсти",
+      "phraseHe": "נעילת לסת",
+      "patientReported": true
+    },
+    {
+      "id": "mouth-opening",
+      "category": "functional",
+      "labelRu": "Трудно открыть рот",
+      "phraseHe": "קושי בפתיחת הפה",
+      "patientReported": true
+    },
+    {
+      "id": "bite-change",
+      "category": "functional",
+      "labelRu": "Изменился прикус",
+      "phraseHe": "תחושה של שינוי בסגר",
+      "patientReported": true
+    },
+    {
+      "id": "chewing-difficult",
+      "category": "functional",
+      "labelRu": "Трудно жевать",
+      "phraseHe": "קושי בלעיסה",
+      "patientReported": true
+    },
+    {
+      "id": "bruxism",
+      "category": "functional",
+      "labelRu": "Скрип зубами",
+      "phraseHe": "חריקת שיניים לפי דיווח המטופל",
+      "patientReported": true
+    },
+    {
+      "id": "jaw-fatigue",
+      "category": "functional",
+      "labelRu": "Усталость жевательных мышц",
+      "phraseHe": "עייפות בשרירי הלעיסה",
+      "patientReported": true
+    },
+    {
+      "id": "speech-denture",
+      "category": "functional",
+      "labelRu": "Протез мешает речи",
+      "phraseHe": "קושי בדיבור עם תותבת",
+      "patientReported": true
+    },
+    {
+      "id": "aesthetic-front",
+      "category": "aesthetic",
+      "labelRu": "Не устраивает эстетика передних зубов",
+      "phraseHe": "אי שביעות רצון ממראה השיניים הקדמיות",
+      "patientReported": true
+    },
+    {
+      "id": "tooth-color",
+      "category": "aesthetic",
+      "labelRu": "Не устраивает цвет зуба",
+      "phraseHe": "אי שביעות רצון מצבע השן",
+      "patientReported": true
+    },
+    {
+      "id": "gap",
+      "category": "aesthetic",
+      "labelRu": "Промежуток между зубами",
+      "phraseHe": "רווח בין השיניים",
+      "patientReported": true
+    },
+    {
+      "id": "missing-replace",
+      "category": "aesthetic",
+      "labelRu": "Хочет восстановить отсутствующий зуб",
+      "phraseHe": "בקשה לשיקום שן חסרה",
+      "patientReported": true
+    },
+    {
+      "id": "implant-interest",
+      "category": "aesthetic",
+      "labelRu": "Интересуется имплантацией",
+      "phraseHe": "בקשה לייעוץ בנושא השתלות",
+      "patientReported": true
+    },
+    {
+      "id": "denture-interest",
+      "category": "aesthetic",
+      "labelRu": "Интересуется протезированием",
+      "phraseHe": "בקשה לייעוץ בנושא תותבות",
+      "patientReported": true
+    },
+    {
+      "id": "checkup",
+      "category": "aesthetic",
+      "labelRu": "Пришёл на осмотр",
+      "phraseHe": "הגעה לבדיקה שגרתית",
+      "patientReported": true
+    },
+    {
+      "id": "no-complaints",
+      "category": "aesthetic",
+      "labelRu": "Жалоб нет",
+      "phraseHe": "ללא תלונות",
+      "patientReported": true
+    },
+    {
+      "id": "second-opinion",
+      "category": "aesthetic",
+      "labelRu": "Просит второе мнение",
+      "phraseHe": "בקשה לחוות דעת נוספת",
+      "patientReported": true
+    },
+    {
+      "id": "treatment-plan",
+      "category": "aesthetic",
+      "labelRu": "Просит план лечения",
+      "phraseHe": "בקשה לתוכנית טיפול",
+      "patientReported": true
+    },
+    {
+      "id": "follow-up",
+      "category": "aesthetic",
+      "labelRu": "Пришёл на контроль",
+      "phraseHe": "הגעה לביקורת",
+      "patientReported": true
+    },
+    {
+      "id": "after-imaging",
+      "category": "aesthetic",
+      "labelRu": "Пришёл после снимков",
+      "phraseHe": "הגעה לאחר ביצוע צילומים",
+      "patientReported": true
+    },
+    {
+      "id": "referral",
+      "category": "aesthetic",
+      "labelRu": "Пришёл по направлению",
+      "phraseHe": "הגעה בעקבות הפניה",
+      "patientReported": true
+    },
+    {
+      "id": "tooth-impact",
+      "category": "trauma_emergency",
+      "labelRu": "Удар по зубу",
+      "phraseHe": "חבלה בשן",
+      "patientReported": true
+    },
+    {
+      "id": "tooth-displacement",
+      "category": "trauma_emergency",
+      "labelRu": "Зуб сместился после травмы",
+      "phraseHe": "תזוזת שן בעקבות חבלה לפי דיווח המטופל",
+      "patientReported": true
+    },
+    {
+      "id": "tooth-avulsed",
+      "category": "trauma_emergency",
+      "labelRu": "Зуб выпал после травмы",
+      "phraseHe": "אובדן שן בעקבות חבלה לפי דיווח המטופל",
+      "patientReported": true
+    },
+    {
+      "id": "bleeding-after-extraction",
+      "category": "trauma_emergency",
+      "labelRu": "Кровотечение после удаления",
+      "phraseHe": "דימום לאחר עקירה",
+      "patientReported": true
+    },
+    {
+      "id": "pain-after-extraction",
+      "category": "trauma_emergency",
+      "labelRu": "Боль после удаления",
+      "phraseHe": "כאב לאחר עקירה",
+      "patientReported": true
+    },
+    {
+      "id": "swelling-after-extraction",
+      "category": "trauma_emergency",
+      "labelRu": "Отёк после удаления",
+      "phraseHe": "נפיחות לאחר עקירה",
+      "patientReported": true
+    },
+    {
+      "id": "lost-temporary",
+      "category": "trauma_emergency",
+      "labelRu": "Выпала временная пломба",
+      "phraseHe": "נפילת סתימה זמנית",
+      "patientReported": true
+    },
+    {
+      "id": "urgent-request",
+      "category": "trauma_emergency",
+      "labelRu": "Просит срочную помощь",
+      "phraseHe": "בקשה לעזרה דחופה",
+      "patientReported": true
+    }
+  ],
+  "modifiers": {
+    "location": [
+      {
+        "id": "tooth",
+        "labelRu": "Конкретный зуб",
+        "phraseHe": "בשן {tooth}"
+      },
+      {
+        "id": "region",
+        "labelRu": "Область зуба",
+        "phraseHe": "באזור שן {tooth}"
+      },
+      {
+        "id": "upper-right",
+        "labelRu": "Верхняя справа",
+        "phraseHe": "בלסת העליונה מימין"
+      },
+      {
+        "id": "upper-left",
+        "labelRu": "Верхняя слева",
+        "phraseHe": "בלסת העליונה משמאל"
+      },
+      {
+        "id": "lower-right",
+        "labelRu": "Нижняя справа",
+        "phraseHe": "בלסת התחתונה מימין"
+      },
+      {
+        "id": "lower-left",
+        "labelRu": "Нижняя слева",
+        "phraseHe": "בלסת התחתונה משמאל"
+      },
+      {
+        "id": "upper",
+        "labelRu": "Верхняя челюсть",
+        "phraseHe": "בלסת העליונה"
+      },
+      {
+        "id": "lower",
+        "labelRu": "Нижняя челюсть",
+        "phraseHe": "בלסת התחתונה"
+      },
+      {
+        "id": "general",
+        "labelRu": "Генерализованно",
+        "phraseHe": "באזורים שונים בחלל הפה"
+      }
+    ],
+    "onset": [
+      {
+        "id": "today",
+        "labelRu": "Сегодня",
+        "phraseHe": "מהיום"
+      },
+      {
+        "id": "yesterday",
+        "labelRu": "Вчера",
+        "phraseHe": "מאתמול"
+      },
+      {
+        "id": "days",
+        "labelRu": "Несколько дней",
+        "phraseHe": "מזה מספר ימים"
+      },
+      {
+        "id": "week",
+        "labelRu": "Около недели",
+        "phraseHe": "מזה כשבוע"
+      },
+      {
+        "id": "weeks",
+        "labelRu": "Несколько недель",
+        "phraseHe": "מזה מספר שבועות"
+      },
+      {
+        "id": "months",
+        "labelRu": "Несколько месяцев",
+        "phraseHe": "מזה מספר חודשים"
+      },
+      {
+        "id": "post-op",
+        "labelRu": "После процедуры",
+        "phraseHe": "לאחר הטיפול"
+      },
+      {
+        "id": "unknown",
+        "labelRu": "Не уточнялось",
+        "phraseHe": ""
+      }
+    ],
+    "intensity": [
+      {
+        "id": "mild",
+        "labelRu": "Слабая",
+        "phraseHe": "בעוצמה קלה"
+      },
+      {
+        "id": "moderate",
+        "labelRu": "Умеренная",
+        "phraseHe": "בעוצמה בינונית"
+      },
+      {
+        "id": "severe",
+        "labelRu": "Сильная",
+        "phraseHe": "בעוצמה חזקה"
+      },
+      {
+        "id": "unknown",
+        "labelRu": "Не уточнялась",
+        "phraseHe": ""
+      }
+    ],
+    "pattern": [
+      {
+        "id": "constant",
+        "labelRu": "Постоянно",
+        "phraseHe": "באופן קבוע"
+      },
+      {
+        "id": "episodic",
+        "labelRu": "Периодически",
+        "phraseHe": "לסירוגין"
+      },
+      {
+        "id": "worsening",
+        "labelRu": "Усиливается",
+        "phraseHe": "עם החמרה"
+      },
+      {
+        "id": "improving",
+        "labelRu": "Уменьшается",
+        "phraseHe": "עם הטבה"
+      },
+      {
+        "id": "unknown",
+        "labelRu": "Не уточнялось",
+        "phraseHe": ""
+      }
+    ],
+    "trigger": [
+      {
+        "id": "cold",
+        "labelRu": "Холод",
+        "phraseHe": "בקור"
+      },
+      {
+        "id": "heat",
+        "labelRu": "Горячее",
+        "phraseHe": "בחום"
+      },
+      {
+        "id": "biting",
+        "labelRu": "Накусывание",
+        "phraseHe": "בנשיכה"
+      },
+      {
+        "id": "chewing",
+        "labelRu": "Жевание",
+        "phraseHe": "בלעיסה"
+      },
+      {
+        "id": "brushing",
+        "labelRu": "Чистка",
+        "phraseHe": "בצחצוח"
+      },
+      {
+        "id": "spontaneous",
+        "labelRu": "Без раздражителя",
+        "phraseHe": "ללא גירוי"
+      },
+      {
+        "id": "none-known",
+        "labelRu": "Не отмечено",
+        "phraseHe": ""
+      }
+    ],
+    "patient_goal": [
+      {
+        "id": "relief",
+        "labelRu": "Снять боль",
+        "phraseHe": "מבקש/ת הקלה בכאב"
+      },
+      {
+        "id": "examination",
+        "labelRu": "Проверка",
+        "phraseHe": "מבקש/ת בדיקה"
+      },
+      {
+        "id": "recement",
+        "labelRu": "Зафиксировать коронку",
+        "phraseHe": "מבקש/ת הדבקת כתר"
+      },
+      {
+        "id": "repair",
+        "labelRu": "Ремонт конструкции",
+        "phraseHe": "מבקש/ת תיקון השיקום"
+      },
+      {
+        "id": "restoration",
+        "labelRu": "Восстановить зуб",
+        "phraseHe": "מבקש/ת שיקום השן"
+      },
+      {
+        "id": "consult",
+        "labelRu": "Консультация",
+        "phraseHe": "מבקש/ת ייעוץ"
+      }
+    ]
+  }
+}

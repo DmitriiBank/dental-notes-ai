@@ -178,16 +178,16 @@ test("dentist can prescribe exact Augmentin strengths and explicitly confirm a p
 
 test("complaint tab supports bulk assignment and tooth-level isolation with live Hebrew output",async({page})=>{
   await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
-  await expect(page.locator("button.chip.whitespace-nowrap")).toHaveText(["Жалобы","Находки","Лечение","Первая помощь","Снимки","Альтернативы","Лаборатория","Лекарства","Коды Maccabi"]);
+  await expect(page.locator("button.chip.whitespace-nowrap")).toHaveText(["Жалобы","Находки","Лечение","Консультации и направления","Первая помощь","Снимки","Альтернативы","Лаборатория","Лекарства","Коды Maccabi"]);
   await page.getByRole("button",{name:"Жалобы",exact:true}).click();
   await page.getByRole("button",{name:"11",exact:true}).click();await page.getByRole("button",{name:"12",exact:true}).click();
   await page.getByRole("button",{name:"Боль при накусывании",exact:true}).click();
   const record=page.getByLabel("Предпросмотр записи на иврите");
-  await expect(record).toHaveValue(/סיבת הביקור:\nהמטופל מדווח על כאב בנשיכה בשיניים 11 ו12/u);
+  await expect(record).toHaveValue(/סיבת הביקור:\nלדברי המטופל\/ת, כאב בעת נשיכה, בשיניים 11 ו12/u);
   await page.getByRole("button",{name:"12",exact:true}).click();
   await page.getByRole("button",{name:"Боль при накусывании",exact:true}).click();
-  await expect(record).toHaveValue(/כאב בנשיכה בשן 12/u);
-  await expect(record).not.toHaveValue(/כאב בנשיכה בשן 11/u);
+  await expect(record).toHaveValue(/כאב בעת נשיכה, בשן 12/u);
+  await expect(record).not.toHaveValue(/כאב בעת נשיכה, בשן 11/u);
 });
 
 test("complaints support no-complaint exclusivity, optional dropdown details and local saving",async({page})=>{
@@ -199,23 +199,29 @@ test("complaints support no-complaint exclusivity, optional dropdown details and
   await expect(page.getByRole("button",{name:"Жалоб нет",exact:true}).first()).toHaveAttribute("aria-pressed","true");
   await expect(page.getByRole("button",{name:"Самопроизвольная боль",exact:true})).toHaveAttribute("aria-pressed","false");
   await page.getByRole("button",{name:"Жалоб нет",exact:true}).first().click();
-  await page.getByRole("button",{name:"Чувствительность к холодному",exact:true}).click();
-  await page.getByLabel("Интенсивность: Чувствительность к холодному 36").selectOption("severe");
-  await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/רגישות לקור בשן 36, בעוצמה חזקה/u);
+  await page.getByRole("button",{name:"На холодное",exact:true}).click();
+  await page.getByLabel("Интенсивность: На холодное 36").selectOption("severe");
+  await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/רגישות לקור, בשן 36, בעוצמה חזקה/u);
   await page.getByRole("button",{name:"Сохранить локально",exact:true}).click();
   await page.reload();await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
   await page.getByRole("button",{name:"Загрузить локальный черновик",exact:true}).click();
-  await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/רגישות לקור בשן 36, בעוצמה חזקה/u);
+  await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/רגישות לקור, בשן 36, בעוצמה חזקה/u);
 });
 
 test("region and general complaints remain separate from objective findings",async({page})=>{
   await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
   await page.getByRole("button",{name:"Жалобы",exact:true}).click();
-  await page.getByLabel("Область жалобы").selectOption("Справа");
-  await page.getByRole("button",{name:"Локальная припухлость",exact:true}).click();
-  await page.getByRole("button",{name:"Профилактический осмотр",exact:true}).click();
+  await page.getByLabel("Область жалобы").selectOption("upper-right");
+  await page.getByRole("button",{name:"Опухла десна",exact:true}).click();
+  await page.getByRole("button",{name:"Пришёл на осмотр",exact:true}).click();
   const record=page.getByLabel("Предпросмотр записи на иврите");
-  await expect(record).toHaveValue(/נפיחות מקומית באזור הצד הימני/u);
-  await expect(record).toHaveValue(/בקשה לבדיקה תקופתית/u);
+  await expect(record).toHaveValue(/נפיחות בחניכיים, בלסת העליונה מימין/u);
+  await expect(record).toHaveValue(/הגעה לבדיקה שגרתית/u);
   await expect(record).not.toHaveValue(/ממצאים קליניים/u);
 });
+
+test("consultation editor creates multiple tooth and whole-plan referrals without appointments",async({page})=>{await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");await page.getByRole("button",{name:"11",exact:true}).click();await page.getByRole("button",{name:"12",exact:true}).click();await page.getByRole("button",{name:"Консультации и направления",exact:true}).click();await page.getByRole("button",{name:/יועץ שיקום/u}).click();await page.getByRole("button",{name:"Сложная ортопедическая реабилитация",exact:true}).click();await page.getByRole("button",{name:/מומחה לטיפולי שורש/u}).click();const scopes=page.getByLabel("Объект консультации");await scopes.nth(1).selectOption("plan");const record=page.getByLabel("Предпросмотр записи на иврите");await expect(record).toHaveValue(/יועץ שיקום לשיניים 11 ו12/u);await expect(record).toHaveValue(/מומחה לטיפולי שורש עבור תוכנית הטיפול הכוללת/u);await expect(page.getByText("Нет приемов для расписания",{exact:true})).toBeVisible()});
+
+test("completed consultation requires confirmation and blocking errors disable copy and export",async({page})=>{await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");await page.getByRole("button",{name:"Консультации и направления",exact:true}).click();await page.getByRole("button",{name:/רופא שתלים/u}).click();await page.getByLabel("Статус консультации").selectOption("completed");await expect(page.getByRole("button",{name:"Копировать итоговую запись"})).toBeDisabled();await expect(page.getByRole("button",{name:"Экспортировать итоговую запись"})).toBeDisabled();await page.getByText("Выполнение консультации подтверждено врачом",{exact:true}).click();await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/התקיים ייעוץ אצל רופא שתלים/u);await expect(page.getByRole("button",{name:"Копировать итоговую запись"})).toBeEnabled()});
+
+test("manual Hebrew becomes stale after clinical changes and cannot be exported",async({page})=>{await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");const record=page.getByLabel("Предпросмотр записи на иврите");await page.getByTitle("Редактировать итог").click();await record.fill("טקסט ידני");await page.getByRole("button",{name:"26",exact:true}).click();await page.getByRole("button",{name:"Первичный кариес",exact:true}).click();await expect(page.getByText(/Клинические данные изменились после ручного редактирования/u)).toBeVisible();await expect(page.getByRole("button",{name:"Копировать итоговую запись"})).toBeDisabled();await expect(page.getByRole("button",{name:"Экспортировать итоговую запись"})).toBeDisabled()});

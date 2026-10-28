@@ -5,7 +5,7 @@ export function emptyDraft(): ClinicalDraft {
   return {
     examination: { complaint:"", extraoral:"", softTissues:"", occlusion:"", hygiene:"", periodontal:"", details:[], normalsConfirmed:false, medicalFlags:[] },
     teeth: emptyTeeth(), implants:[], imaging:[], alternatives:[], generalTreatments:[], edentulous:[], customDurations:{}, firstAidSelections:[], selectedMaccabiCodes:{}, eligibility:{ageGroup:"unknown",verified:false},
-    labConstructions:[], labOrders:[], externalProcedureDependencies:[], patientDecisions:[], medications:[], medicationSafetyReviews:[], mentorChecklists:[], regionalComplaints:[], generalComplaints:[]
+    labConstructions:[], labOrders:[], externalProcedureDependencies:[], patientDecisions:[], medications:[], medicationSafetyReviews:[], mentorChecklists:[], regionalComplaints:[], generalComplaints:[], consultations:[]
   };
 }
 const tr = (id:string, kind:string, status:Treatment["status"], tooth?:number, surfaces?:Treatment["surfaces"]):Treatment => ({id,kind,status,tooth,surfaces});
@@ -14,7 +14,7 @@ export function caseA(): ClinicalDraft {
   const d=emptyDraft(); d.examination.complaint="ניידות באזור שן 15";
   Object.assign(d.teeth[15], {findings:["artificial-crown","crown-with-root","root-caries"],surfaces:["C"], treatments:[tr("a-ex","extraction","recommended",15),tr("a-flip","immediate-denture","recommended",15)]});
   [[13,["P","D"]],[12,["M","P","D"]],[11,["P","M"]]].forEach(([n,s],i)=>Object.assign(d.teeth[n as number],{findings:["primary-caries"],surfaces:s,treatments:[tr(`a-f${i}`,"filling","planned",n as number,s as Treatment["surfaces"])]}));
-  d.teeth[45].missing=true; d.generalTreatments=[tr("a-imp15","implant-consult","recommended",15),tr("a-imp45","implant-consult","recommended",45),{...tr("a-impr","immediate-denture","completed",15),stage:1,shade:"A3"}]; return d;
+  d.teeth[45].missing=true; d.generalTreatments=[{...tr("a-impr","immediate-denture","completed",15),stage:1,shade:"A3"}];d.consultations=[{id:"a-imp15",type:"implantologist",target:{kind:"teeth",teeth:[15]},reasons:["implant-planning"],status:"recommended",completionConfirmed:false},{id:"a-imp45",type:"implantologist",target:{kind:"teeth",teeth:[45]},reasons:["implant-planning"],status:"recommended",completionConfirmed:false}]; return d;
 }
 export function caseB(): ClinicalDraft { const d=emptyDraft(); Object.assign(d.teeth[26],{findings:["deep-caries"],surfaces:["O","M"],treatments:[tr("b-f","filling","planned",26,["O","M"])]}); return d; }
 export function caseC(): ClinicalDraft { const d=emptyDraft(); d.imaging=[{id:"c-img",kind:"periapical",status:"reviewed",target:"שן 27",findings:["periapical"]}]; d.alternatives=[{id:"c1",tooth:27,label:"בירור אנדודונטי ושיקום השן במידת האפשר",offered:true,feasible:true,risksExplained:true,prognosisDiscussed:true,decision:"selected"},{id:"c2",tooth:27,label:"עקירה והשלמת השן החסרה",offered:true,feasible:true,risksExplained:true,prognosisDiscussed:true,decision:"pending"}]; return d; }

@@ -75,7 +75,7 @@ describe("Hebrew grammar and deterministic clinical composition", () => {
 
   it("keeps the treatment plan as one continuous paragraph", () => {
     const draft = caseC();
-    draft.generalTreatments.push({ id: "consult", kind: "endo-consult", status: "recommended" });
+    draft.consultations=[{id:"consult",type:"endodontist",target:{kind:"plan"},reasons:["endodontic-pathology"],status:"recommended",completionConfirmed:false}];
     const plan = generateHebrewRecord(draft).split("תוכנית טיפול והמלצות:\n")[1];
     expect(plan).toBeTruthy();
     expect(plan).not.toContain("\n");

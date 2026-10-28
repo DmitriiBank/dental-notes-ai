@@ -32,6 +32,7 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
     if (medication.allergyCheck === "not-checked") add(`medication-allergy-${medication.id}`, "review", "Проверка лекарственной аллергии не подтверждена.");
     if (medication.penicillinAllergyAlternative && !medication.clinicianSelectionConfirmed) add(`medication-alternative-${medication.id}`, "blocking", "Антибиотик при аллергии на пенициллин требует явного подтверждения выбора врачом.");
   });
+  (d.consultations??[]).forEach(item=>{if(item.target.kind==="teeth"&&!item.target.teeth.length)add(`consultation-target-${item.id}`,"blocking","Для консультации необходимо выбрать хотя бы один зуб или другой объект направления.");if(item.status==="completed"&&!item.completionConfirmed)add(`consultation-completion-${item.id}`,"blocking","Завершенная консультация требует явного подтверждения врача.");});
   const treatments=treatmentsFor(d);
   const invasiveKinds=new Set(["extraction","surgical-extraction","implant-placement","bone-augmentation","sinus-lift"]);
   const invasive=treatments.some(treatment=>["planned","recommended"].includes(treatment.status)&&invasiveKinds.has(treatment.kind));
