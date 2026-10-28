@@ -155,7 +155,8 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   groupTreatments(allTreatments.filter(treatment => treatment.status !== "completed" && treatment.status !== "cancelled")).forEach(group => {
     plan.push(`${TREATMENT_STATUS[group[0].status]} ${groupedTreatmentText(group)}`);
   });
-  draft.alternatives.map(alternativeText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
+  if(draft.treatmentOptions?.confirmed){const o=draft.treatmentOptions;if(o.first.trim())plan.push(`אפשרות טיפול ראשונה: ${o.first.trim()}`);if(o.second.trim())plan.push(`אפשרות טיפול שנייה: ${o.second.trim()}`);if(o.decision==="no-treatment")plan.push("המטופל אינו מעוניין בטיפול בשלב זה");if(o.decision==="first"&&o.first.trim())plan.push("המטופל בחר באפשרות הטיפול הראשונה");if(o.decision==="second"&&o.second.trim())plan.push("המטופל בחר באפשרות הטיפול השנייה");}
+  else draft.alternatives.map(alternativeText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
   (draft.labConstructions ?? []).map(labConstructionText).forEach(value => plan.push(value));
   (draft.labOrders ?? []).map(labOrderRemakeText).filter((value): value is string => Boolean(value)).forEach(value=>plan.push(value));
   (draft.labOrders ?? []).map(labOrderInstructionText).filter((value): value is string => Boolean(value)).forEach(value=>plan.push(value));
@@ -164,5 +165,7 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   plan.push(...(firstAid.get("recommendation") ?? []), ...(firstAid.get("counseling") ?? []));
   if (plan.length) sections.push(`תוכנית טיפול והמלצות:\n${sentence(unique(plan).map(value=>value.trim().replace(/[.;]+$/u,"")).join("; "))}`);
 
+  const letters=(draft.labLetters??[]).filter(letter=>letter.text.trim()).map(letter=>`${letter.teeth.length?`שיניים ${letter.teeth.join(", ")}: `:""}${letter.text.trim()}`);
+  if(letters.length)sections.push(`הוראות למעבדה:\n${letters.join("\n")}`);
   return cleanOutput(sections.join("\n\n"));
 }
