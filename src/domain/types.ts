@@ -263,7 +263,16 @@ export interface ClinicalDraft {
   generalComplaints?: ComplaintSelection[];
   consultations?: ConsultationReferral[];
   regionalClinicalFindings?: RegionalClinicalFinding[];
+  revision?: number;
   updatedAt?: string;
+}
+
+export interface SectionOverride {
+  sectionId: string;
+  text: string;
+  basedOnRevision: number;
+  originalGeneratedText: string;
+  reviewed: boolean;
 }
 
 export interface Appointment {

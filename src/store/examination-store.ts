@@ -1,45 +1,40 @@
 "use client";
-import { create } from "zustand";
-import type { ClinicalDraft, Jaw, Surface, Treatment } from "@/domain/types";
-import { emptyDraft } from "@/domain/fixtures";
-import { LOWER, UPPER } from "@/domain/teeth";
-import { normalizeDraft } from "@/domain/normalize-draft";
+import {create} from "zustand";
+import type {ClinicalDraft,Jaw,SectionOverride,Surface,Treatment} from "@/domain/types";
+import {emptyDraft} from "@/domain/fixtures";
+import {LOWER,UPPER} from "@/domain/teeth";
+import {normalizeDraft} from "@/domain/normalize-draft";
 
+interface WorkspaceSnapshot {draft:ClinicalDraft;sectionOverrides:Record<string,SectionOverride>}
 interface Store {
-  draft: ClinicalDraft;
-  selected: number[];
-  history: ClinicalDraft[];
-  saved: boolean;
-  setDraft: (d: ClinicalDraft) => void;
-  update: (fn: (d: ClinicalDraft) => void) => void;
-  select: (n: number, multi?: boolean) => void;
-  selectMany: (n: number[]) => void;
-  clearSelection: () => void;
-  toggleFinding: (id: string) => void;
-  toggleComplaint: (id: string) => void;
-  toggleSurface: (s: Surface) => void;
-  addTreatment: (kind: string) => void;
-  setEdentulous: (jaws: Jaw[]) => void;
-  undo: () => void;
-  reset: () => void;
-  saveLocal: () => void;
-  loadLocal: () => void;
+  draft:ClinicalDraft;sectionOverrides:Record<string,SectionOverride>;selected:number[];history:WorkspaceSnapshot[];future:WorkspaceSnapshot[];saved:boolean;
+  setDraft:(draft:ClinicalDraft)=>void;update:(fn:(draft:ClinicalDraft)=>void)=>void;select:(tooth:number,multi?:boolean)=>void;selectMany:(teeth:number[])=>void;clearSelection:()=>void;
+  toggleFinding:(id:string)=>void;toggleComplaint:(id:string)=>void;toggleSurface:(surface:Surface)=>void;addTreatment:(kind:string)=>void;setEdentulous:(jaws:Jaw[])=>void;
+  setSectionOverride:(sectionId:string,text:string,generatedText:string)=>void;reviewSectionOverride:(sectionId:string,generatedText:string)=>void;removeSectionOverride:(sectionId:string)=>void;
+  undo:()=>void;redo:()=>void;reset:()=>void;saveLocal:()=>void;loadLocal:()=>void;
 }
-const clone = (d: ClinicalDraft) => structuredClone(d);
+const clone=<T,>(value:T):T=>structuredClone(value);
+const snapshot=(state:Pick<Store,"draft"|"sectionOverrides">):WorkspaceSnapshot=>({draft:clone(state.draft),sectionOverrides:clone(state.sectionOverrides)});
+const historyFor=(state:Store)=>[...state.history.slice(-49),snapshot(state)];
+const touch=(draft:ClinicalDraft)=>{draft.revision=(draft.revision??0)+1;draft.updatedAt=new Date().toISOString()};
 
-export const useExamStore = create<Store>((set,get) => ({
-  draft: emptyDraft(), selected: [], history: [], saved: true,
-  setDraft: draft => set({draft:normalizeDraft(draft), selected:[], history:[], saved:false}),
-  update: fn => set(s => { const next=clone(s.draft); fn(next); next.updatedAt=new Date().toISOString(); return {draft:next,history:[...s.history.slice(-19),clone(s.draft)],saved:false}; }),
-  select: (n,multi=true) => set(s=>({selected:multi?(s.selected.includes(n)?s.selected.filter(x=>x!==n):[...s.selected,n]):[n]})),
-  selectMany: selected => set({selected}), clearSelection:()=>set({selected:[]}),
-  toggleFinding:id=>get().update(d=>get().selected.forEach(n=>{const a=d.teeth[n].findings;if(a.includes(id))a.splice(a.indexOf(id),1);else a.push(id)})),
-  toggleComplaint:id=>get().update(d=>get().selected.forEach(n=>{const a=d.teeth[n].complaints??=[];d.teeth[n].complaints=a;const index=a.findIndex(item=>item.complaintId===id);if(index>=0){a.splice(index,1);return}if(id==="no-complaints")a.splice(0);else{const none=a.findIndex(item=>item.complaintId==="no-complaints");if(none>=0)a.splice(none,1)}a.push({complaintId:id})})),
-  toggleSurface:surface=>get().update(d=>get().selected.forEach(n=>{const a=d.teeth[n].surfaces;if(a.includes(surface))a.splice(a.indexOf(surface),1);else a.push(surface)})),
-  addTreatment:kind=>get().update(d=>get().selected.forEach(n=>{const id=crypto.randomUUID();const t:Treatment={id,kind,status:"planned",tooth:n,surfaces:[...d.teeth[n].surfaces]};d.teeth[n].treatments.push(t)})),
-  setEdentulous:jaws=>get().update(d=>{const nums=jaws.flatMap(j=>j==="upper"?UPPER:LOWER);nums.forEach(n=>{d.teeth[n].missing=true;d.teeth[n].findings=[];d.teeth[n].surfaces=[];d.teeth[n].treatments=[]});d.edentulous=Array.from(new Set([...d.edentulous,...jaws]));}),
-  undo:()=>set(s=>{const prev=s.history.at(-1);return prev?{draft:prev,history:s.history.slice(0,-1),saved:false}:s}),
-  reset:()=>set({draft:emptyDraft(),selected:[],history:[],saved:true}),
-  saveLocal:()=>{localStorage.setItem("dental-notes-demo",JSON.stringify(get().draft));set({saved:true})},
-  loadLocal:()=>{const raw=localStorage.getItem("dental-notes-demo");if(raw)set({draft:normalizeDraft(JSON.parse(raw) as ClinicalDraft),selected:[],history:[],saved:true})}
+export const useExamStore=create<Store>((set,get)=>({
+  draft:emptyDraft(),sectionOverrides:{},selected:[],history:[],future:[],saved:true,
+  setDraft:draft=>set(state=>({draft:normalizeDraft(draft),sectionOverrides:{},selected:[],history:historyFor(state),future:[],saved:false})),
+  update:fn=>set(state=>{const draft=clone(state.draft);fn(draft);touch(draft);return{draft,history:historyFor(state),future:[],saved:false}}),
+  select:(tooth,multi=true)=>set(state=>({selected:multi?(state.selected.includes(tooth)?state.selected.filter(value=>value!==tooth):[...state.selected,tooth]):[tooth]})),
+  selectMany:selected=>set({selected}),clearSelection:()=>set({selected:[]}),
+  toggleFinding:id=>get().update(draft=>{const teeth=get().selected;const allActive=teeth.length>0&&teeth.every(tooth=>draft.teeth[tooth].findings.includes(id));teeth.forEach(tooth=>{const list=draft.teeth[tooth].findings;const index=list.indexOf(id);if(allActive&&index>=0)list.splice(index,1);else if(!allActive&&index<0)list.push(id)})}),
+  toggleComplaint:id=>get().update(draft=>{const teeth=get().selected;const allActive=teeth.length>0&&teeth.every(tooth=>(draft.teeth[tooth].complaints??[]).some(item=>item.complaintId===id));teeth.forEach(tooth=>{const list=draft.teeth[tooth].complaints??=[];draft.teeth[tooth].complaints=list;const index=list.findIndex(item=>item.complaintId===id);if(allActive){if(index>=0)list.splice(index,1);return}if(index>=0)return;if(id==="no-complaints")list.splice(0);else{const none=list.findIndex(item=>item.complaintId==="no-complaints");if(none>=0)list.splice(none,1)}list.push({complaintId:id})})}),
+  toggleSurface:surface=>get().update(draft=>{const teeth=get().selected;const allActive=teeth.length>0&&teeth.every(tooth=>draft.teeth[tooth].surfaces.includes(surface));teeth.forEach(tooth=>{const list=draft.teeth[tooth].surfaces;const index=list.indexOf(surface);if(allActive&&index>=0)list.splice(index,1);else if(!allActive&&index<0)list.push(surface)})}),
+  addTreatment:kind=>get().update(draft=>{const teeth=get().selected;const allActive=teeth.length>0&&teeth.every(tooth=>draft.teeth[tooth].treatments.some(item=>item.kind===kind&&item.status==="planned"));teeth.forEach(tooth=>{const list=draft.teeth[tooth].treatments;if(allActive){const index=list.findIndex(item=>item.kind===kind&&item.status==="planned");if(index>=0){delete draft.selectedMaccabiCodes[list[index].id];list.splice(index,1)}}else if(!list.some(item=>item.kind===kind&&item.status==="planned")){const treatment:Treatment={id:crypto.randomUUID(),kind,status:"planned",tooth,surfaces:[...draft.teeth[tooth].surfaces]};list.push(treatment)}})}),
+  setEdentulous:jaws=>get().update(draft=>{const teeth=jaws.flatMap(jaw=>jaw==="upper"?UPPER:LOWER);teeth.forEach(tooth=>{draft.teeth[tooth].missing=true;draft.teeth[tooth].findings=[];draft.teeth[tooth].surfaces=[];draft.teeth[tooth].treatments=[]});draft.edentulous=Array.from(new Set([...draft.edentulous,...jaws]))}),
+  setSectionOverride:(sectionId,text,generatedText)=>set(state=>{const current=state.sectionOverrides[sectionId];if(current?.text===text)return state;return{sectionOverrides:{...state.sectionOverrides,[sectionId]:{sectionId,text,basedOnRevision:state.draft.revision??0,originalGeneratedText:generatedText,reviewed:true}},history:historyFor(state),future:[],saved:false}}),
+  reviewSectionOverride:(sectionId,generatedText)=>set(state=>{const current=state.sectionOverrides[sectionId];if(!current)return state;return{sectionOverrides:{...state.sectionOverrides,[sectionId]:{...current,basedOnRevision:state.draft.revision??0,originalGeneratedText:generatedText,reviewed:true}},history:historyFor(state),future:[],saved:false}}),
+  removeSectionOverride:sectionId=>set(state=>{if(!state.sectionOverrides[sectionId])return state;const next={...state.sectionOverrides};delete next[sectionId];return{sectionOverrides:next,history:historyFor(state),future:[],saved:false}}),
+  undo:()=>set(state=>{const previous=state.history.at(-1);if(!previous)return state;return{draft:clone(previous.draft),sectionOverrides:clone(previous.sectionOverrides),history:state.history.slice(0,-1),future:[snapshot(state),...state.future].slice(0,50),saved:false}}),
+  redo:()=>set(state=>{const next=state.future[0];if(!next)return state;return{draft:clone(next.draft),sectionOverrides:clone(next.sectionOverrides),history:[...state.history,snapshot(state)].slice(-50),future:state.future.slice(1),saved:false}}),
+  reset:()=>set(state=>({draft:emptyDraft(),sectionOverrides:{},selected:[],history:historyFor(state),future:[],saved:true})),
+  saveLocal:()=>{const state=get();localStorage.setItem("dental-notes-demo",JSON.stringify({version:2,draft:state.draft,sectionOverrides:state.sectionOverrides}));set({saved:true})},
+  loadLocal:()=>{const raw=localStorage.getItem("dental-notes-demo");if(!raw)return;const parsed=JSON.parse(raw) as ClinicalDraft|{version:number;draft:ClinicalDraft;sectionOverrides?:Record<string,SectionOverride>};const wrapped="draft" in parsed;const draft=wrapped?parsed.draft:parsed;const overrides=wrapped?(parsed.sectionOverrides??{}):{};set(state=>({draft:normalizeDraft(draft),sectionOverrides:clone(overrides),selected:[],history:historyFor(state),future:[],saved:true}))},
 }));
