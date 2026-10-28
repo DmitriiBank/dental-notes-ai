@@ -5,10 +5,28 @@ import { MACCABI_CATALOG as CODES, MACCABI_CATALOG_VERSION, type MaccabiCatalogE
 export const MACCABI_SOURCE_VERSION = MACCABI_CATALOG_VERSION;
 
 const targetFor=(treatment:Treatment)=>treatment.tooth?`שן ${treatment.tooth}`:treatment.jaw==="upper"?"לסת עליונה":treatment.jaw==="lower"?"לסת תחתונה":"לא צוין";
+const toothClassFor=(treatment:Treatment):MaccabiCodeCandidate["toothClass"]=>treatment.tooth?(positionFor(treatment.tooth)<=3?"anterior":"posterior"):treatment.kind.includes("implant")||treatment.kind==="multi-unit"?"implant":treatment.jaw?"jaw":"not-applicable";
+const restorationClassFor=(treatment:Treatment,code:MaccabiCatalogEntry)=>{
+  if(code.shortCode==="סל4")return"Class IV";if(code.shortCode==="סל")return"Class III/V";
+  if(["שקא1","שקא2","שקא3"].includes(code.shortCode))return`${new Set(treatment.surfaces??[]).size} surface${new Set(treatment.surfaces??[]).size===1?"":"s"}`;
+  return undefined;
+};
+const eligibilityFor=(draft:ClinicalDraft,code:MaccabiCatalogEntry,verificationStatus:MaccabiCodeCandidate["verificationStatus"]):MaccabiCodeCandidate["eligibilityStatus"]=>{
+  if(verificationStatus!=="verified-snapshot"||code.eligibility==="requires-context")return"needs_review";
+  const ageRules=code.verifiedAgeGroups;const coverageRules=code.verifiedCoverageCategories;
+  const patientSpecificContext=draft.eligibility?.ageGroup!=="unknown"||Boolean(draft.eligibility?.contractCategory);
+  if(patientSpecificContext&&!ageRules?.length&&!coverageRules?.length)return"needs_review";
+  if((ageRules?.length||coverageRules?.length)&&!draft.eligibility?.verified)return"needs_review";
+  if(ageRules?.length&&draft.eligibility.ageGroup!=="unknown"&&!ageRules.includes(draft.eligibility.ageGroup))return"not_eligible";
+  if(coverageRules?.length&&(!draft.eligibility.contractCategory||!coverageRules.includes(draft.eligibility.contractCategory)))return"not_eligible";
+  return"eligible";
+};
 const candidate=(draft:ClinicalDraft,treatment:Treatment,code:MaccabiCatalogEntry,verificationStatus:MaccabiCodeCandidate["verificationStatus"]="verified-snapshot",clarification?:string):MaccabiCodeCandidate=>({
   treatmentId:treatment.id,shortCode:code.shortCode,catalogNumber:code.catalogNumber,descriptionHe:code.descriptionHe,sourceVersion:MACCABI_SOURCE_VERSION,
   procedureStatus:treatment.status,providerRole:treatment.provider==="external"?"external":"self",verificationStatus,toothOrJaw:targetFor(treatment),quantity:treatment.quantity??1,
-  selected:draft.selectedMaccabiCodes?.[treatment.id]===code.shortCode||(verificationStatus==="verified-snapshot"&&!draft.selectedMaccabiCodes?.[treatment.id]),clarification,
+  selected:draft.selectedMaccabiCodes?.[treatment.id]===code.shortCode||(verificationStatus==="verified-snapshot"&&eligibilityFor(draft,code,verificationStatus)==="eligible"&&!draft.selectedMaccabiCodes?.[treatment.id]),
+  indication:code.descriptionHe,material:treatment.material,toothClass:toothClassFor(treatment),restorationClass:restorationClassFor(treatment,code),
+  ageRestrictions:code.verifiedAgeGroups??[],coverageRestrictions:code.verifiedCoverageCategories??[],eligibilityStatus:eligibilityFor(draft,code,verificationStatus),clarification,
 });
 const unresolved=(draft:ClinicalDraft,treatment:Treatment,clarification:string):MaccabiCodeCandidate=>candidate(draft,treatment,{shortCode:"UNVERIFIED",catalogNumber:"UNVERIFIED",descriptionHe:"לא נמצא קוד מאומת בספר התעריפים החלקי",eligibility:"requires-context"},"unverified",clarification);
 

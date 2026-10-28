@@ -10,6 +10,7 @@ import {
   phrase,
 } from "./hebrew-catalog";
 import { groupFirstAidSelections } from "./first-aid-catalog";
+import { completedLabStageText, dependencyText, labConstructionText, labOrderRemakeText, medicationSafetyText, medicationText, patientDecisionText } from "./structured-clinical-text";
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const sentence = (value: string) => `${value.trim().replace(/[.;]+$/u, "")}.`;
@@ -79,6 +80,9 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   if (examination.hygiene.trim()) sections.push(`OH: ${sentence(examination.hygiene)}`);
   if (examination.periodontal.trim()) sections.push(`פמ"ר: ${sentence(examination.periodontal)}`);
   if (examination.medicalFlags.length) sections.push(`אנמנזה רפואית:\n${sentence(hebrewList(unique(examination.medicalFlags)))}`);
+  const medicationLines = (draft.medications ?? []).map(medicationText).filter((value): value is string => Boolean(value));
+  (draft.medicationSafetyReviews ?? []).map(medicationSafetyText).forEach(value=>medicationLines.push(value));
+  if (medicationLines.length) sections.push(`תיעוד תרופתי:\n${medicationLines.join(" ")}`);
 
   const clinicalFindings: string[] = [];
   if (draft.edentulous.includes("upper")) clinicalFindings.push("חוסר שיניים מלא בלסת העליונה.");
@@ -100,6 +104,7 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   const allTreatments = [...Object.values(draft.teeth).flatMap(tooth => tooth.treatments), ...draft.generalTreatments];
   const completed = allTreatments.filter(treatment => treatment.status === "completed");
   const completedText = [...completed.map(treatmentText).map(sentence), ...(firstAid.get("completed") ?? [])];
+  (draft.labOrders ?? []).flatMap(order => order.stages).map(completedLabStageText).filter((value): value is string => Boolean(value)).forEach(value => completedText.push(value));
   if (completedText.length) sections.push(`טיפול שבוצע:\n${unique(completedText).join(" ")}`);
 
   const plan: string[] = [];
@@ -107,6 +112,10 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
     plan.push(`${TREATMENT_STATUS[treatment.status]} ${treatmentText(treatment)}`);
   });
   draft.alternatives.map(alternativeText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
+  (draft.labConstructions ?? []).map(labConstructionText).forEach(value => plan.push(value));
+  (draft.labOrders ?? []).map(labOrderRemakeText).filter((value): value is string => Boolean(value)).forEach(value=>plan.push(value));
+  (draft.externalProcedureDependencies ?? []).map(dependencyText).forEach(value=>plan.push(value));
+  (draft.patientDecisions ?? []).map(patientDecisionText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
   plan.push(...(firstAid.get("recommendation") ?? []), ...(firstAid.get("counseling") ?? []));
   if (plan.length) sections.push(`תוכנית טיפול והמלצות:\n${sentence(unique(plan).join("; "))}`);
 

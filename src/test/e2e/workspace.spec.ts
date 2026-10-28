@@ -84,3 +84,48 @@ test("clipboard contains the generated Hebrew record",async({page,context,browse
   await page.getByRole("button",{name:"Копировать итоговую запись",exact:true}).click();
   expect(await page.evaluate(()=>navigator.clipboard.readText())).toContain("שן 26");
 });
+
+test("dentist can define a temporary mobile bridge without marking abutments mobile",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  for(const tooth of [15,16,17])await page.getByRole("button",{name:String(tooth),exact:true}).click();
+  await page.getByRole("button",{name:"Лечение",exact:true}).click();
+  await page.getByRole("button",{name:/^Мост/u}).first().click();
+  await page.getByRole("button",{name:"Лаборатория",exact:true}).click();
+  await page.getByRole("button",{name:"Добавить мост",exact:true}).click();
+  await page.getByLabel("Материал конструкции").fill("zirconia");
+  await page.getByLabel("Постоянство моста").selectOption("temporary");
+  await page.getByLabel("Подвижность всего моста").selectOption("mobile");
+  const record=page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveValue(/יחידות ביניים 16/u);
+  await expect(record).toHaveValue(/מבנה זמני/u);
+  await expect(record).toHaveValue(/ניידות של הגשר כולו/u);
+  await expect(record).not.toHaveValue(/שן 15 מאחזת ניידת/u);
+});
+
+test("patient refusal is linked to a proposed treatment and does not imply risk discussion",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"47",exact:true}).click();
+  await page.getByRole("button",{name:"Лечение",exact:true}).click();
+  await page.getByRole("button",{name:/^Временная пломба/u}).click();
+  await page.getByRole("button",{name:"Альтернативы",exact:true}).click();
+  await page.getByRole("button",{name:"Добавить решение пациента",exact:true}).click();
+  await page.getByLabel("Статус решения пациента").selectOption("refused");
+  await page.getByLabel("Описание решения пациента").fill("סתימה זמנית בשן 47");
+  await page.getByLabel("Причина отказа").fill("המטופל מבקש להמתין");
+  const record=page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveValue(/המטופל סירב: סתימה זמנית בשן 47/u);
+  await expect(record).not.toHaveValue(/הסיכונים הוסברו/u);
+});
+
+test("unsupported age eligibility is visibly needs_review and no suffix is invented",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"47",exact:true}).click();
+  await page.getByRole("button",{name:"O",exact:true}).click();
+  await page.getByRole("button",{name:"Лечение",exact:true}).click();
+  await page.getByRole("button",{name:/^Пломба/u}).click();
+  await page.getByRole("button",{name:"Коды Maccabi",exact:true}).click();
+  await page.getByLabel("Возрастная группа тарифа").selectOption("over75");
+  await expect(page.getByText("needs_review",{exact:true}).first()).toBeVisible();
+  await expect(page.getByText(/суффикс не добавлен/u)).toBeVisible();
+  await expect(page.getByLabel("MaccabiDent codes review")).not.toContainText(/שקא1-75|13505-75/u);
+});

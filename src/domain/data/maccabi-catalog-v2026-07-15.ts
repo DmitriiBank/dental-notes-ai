@@ -1,7 +1,14 @@
 export const MACCABI_CATALOG_VERSION = "contract-appendix-2026-07-15-main-codes";
 export const MACCABI_CATALOG_NOTICE = "Тарифное приложение от 15.07.2026: основные коды без цен; исключены Assuta, ג3, детские, специалисты, системные программы и акции. Применимость к врачу и договору необходимо проверить.";
 
-export interface MaccabiCatalogEntry { shortCode:string; catalogNumber:string; descriptionHe:string; eligibility:"base"|"requires-context" }
+export interface MaccabiCatalogEntry {
+  shortCode:string;
+  catalogNumber:string;
+  descriptionHe:string;
+  eligibility:"base"|"requires-context";
+  verifiedAgeGroups?: Array<"under18"|"adult"|"over75"|"over80">;
+  verifiedCoverageCategories?: string[];
+}
 export const MACCABI_CATALOG = {
   posterior1:{shortCode:"שקא1",catalogNumber:"13505",descriptionHe:"שחזור קומפוזיט בשן אחורית, משטח אחד",eligibility:"base"},
   posterior2:{shortCode:"שקא2",catalogNumber:"13510",descriptionHe:"שחזור קומפוזיט בשן אחורית, שני משטחים",eligibility:"base"},
