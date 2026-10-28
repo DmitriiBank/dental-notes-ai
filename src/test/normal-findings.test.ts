@@ -20,6 +20,8 @@ describe("normal clinical findings",()=>{
     expect(ids).toContain("mobility-conflict-36");
     expect(ids).toContain("pockets-conflict-36");
   });
+  it("records missing teeth in the clinical findings",()=>{const d=emptyDraft();d.teeth[36].missing=true;d.teeth[37].missing=true;const text=generateHebrewRecord(d);expect(text).toContain("36");expect(text).toContain("37");expect(text).toContain("חסרות");});
+  it("retains missing lower teeth when upper jaw is fully edentulous",()=>{const d=emptyDraft();d.edentulous=["upper"];d.teeth[36].missing=true;const text=generateHebrewRecord(d);expect(text).toContain("חוסר שיניים מלא בלסת העליונה");expect(text).toContain("36");});
   it("does not invent normal findings",()=>{
     const text=generateHebrewRecord(emptyDraft());
     expect(text).not.toContain("ללא ניידות");
