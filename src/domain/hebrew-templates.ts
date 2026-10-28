@@ -13,6 +13,7 @@ import { completedLabStageText, dependencyText, labConstructionText, labOrderIns
 import { complaintSentences } from "./complaint-catalog";
 import { consultationText } from "./consultation-catalog";
 import { aggregateClinicalFindings, toothSpecificClinicalDetails } from "./clinical-presentation";
+import { discussionText, groupedPerformedTexts } from "./performed-treatment";
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const sentence = (value: string) => `${value.trim().replace(/[.;]+$/u, "")}.`;
@@ -141,6 +142,8 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   const allTreatments = [...Object.values(draft.teeth).flatMap(tooth => tooth.treatments), ...draft.generalTreatments];
   const completed = allTreatments.filter(treatment => treatment.status === "completed");
   const completedText = [...groupTreatments(completed).map(groupedTreatmentText).map(sentence), ...(firstAid.get("completed") ?? [])];
+  completedText.push(...groupedPerformedTexts(draft.performedActs??[]));
+  completedText.push(...(draft.clinicalDiscussions??[]).filter(item=>item.explicitlyExplained&&item.clinicianConfirmed).map(discussionText));
   (draft.labOrders ?? []).flatMap(order => order.stages).map(completedLabStageText).filter((value): value is string => Boolean(value)).forEach(value => completedText.push(value));
   if (completedText.length) sections.push(`טיפול שבוצע:\n${unique(completedText).join(" ")}`);
 

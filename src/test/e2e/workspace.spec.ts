@@ -1,4 +1,87 @@
 import { test, expect } from "@playwright/test";
+
+const acceptNextDialog=(page:import("@playwright/test").Page)=>page.once("dialog",dialog=>dialog.accept());
+const dismissNextDialog=(page:import("@playwright/test").Page)=>page.once("dialog",dialog=>dialog.dismiss());
+
+test("performed-treatment tab follows treatment and requires explicit confirmation",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  const tabs=page.locator(".sticky.top-0.z-10").first().getByRole("button");
+  const labels=await tabs.allTextContents();
+  expect(labels.indexOf("Проведённое лечение")).toBe(labels.indexOf("Лечение")+1);
+  await page.getByRole("button",{name:"36",exact:true}).click();
+  await page.getByRole("button",{name:"B",exact:true}).click();
+  await page.getByRole("button",{name:"Проведённое лечение",exact:true}).click();
+  await page.getByRole("button",{name:"Filtek",exact:true}).click();
+  await page.getByRole("button",{name:"A2",exact:true}).click();
+  const action=page.getByRole("button",{name:/Постоянная композитная пломба/u});
+  dismissNextDialog(page);await action.click();
+  await expect(page.getByLabel("Предпросмотр записи на иврите")).not.toHaveValue(/שחזור קומפוזיט/u);
+  acceptNextDialog(page);await action.click();
+  const record=page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveValue(/שחזור קומפוזיט בשן 36 \(B\)/u);
+  await expect(record).toHaveValue(/Filtek/u);
+  await expect(record).toHaveValue(/A2/u);
+});
+
+test("bulk performed treatment creates reversible tooth-level acts",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  for(const tooth of [11,12,13])await page.getByRole("button",{name:String(tooth),exact:true}).click();
+  await page.getByRole("button",{name:"Проведённое лечение",exact:true}).click();
+  acceptNextDialog(page);await page.getByRole("button",{name:/Постоянная композитная пломба/u}).click();
+  await expect(page.getByText(/Записанные выполненные этапы/u)).toBeVisible();
+  await expect(page.getByLabel(/Удалить выполненное действие composite-filling/u)).toHaveCount(3);
+  const record=page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveValue(/11, 12 ו13/u);
+  dismissNextDialog(page);await page.getByLabel(/Удалить выполненное действие composite-filling/u).nth(1).click();
+  await expect(page.getByLabel(/Удалить выполненное действие composite-filling/u)).toHaveCount(3);
+  acceptNextDialog(page);await page.getByLabel(/Удалить выполненное действие composite-filling/u).nth(1).click();
+  await expect(page.getByLabel(/Удалить выполненное действие composite-filling/u)).toHaveCount(2);
+  await expect(record).not.toHaveValue(/11, 12 ו13/u);
+  await page.getByTitle("Отменить").click();
+  await expect(page.getByLabel(/Удалить выполненное действие composite-filling/u)).toHaveCount(3);
+});
+
+test("deep-caries explanations remain independent and off by default",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"26",exact:true}).click();
+  await page.getByRole("button",{name:"Проведённое лечение",exact:true}).click();
+  await page.getByRole("button",{name:"Глубокий кариес",exact:true}).click();
+  acceptNextDialog(page);await page.getByRole("button",{name:/Постоянная композитная пломба/u}).click();
+  const record=page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).not.toHaveValue(/ייתכנו כאבים|צורך בטיפול שורש/u);
+  acceptNextDialog(page);await page.getByRole("button",{name:"Объяснена возможная боль после лечения",exact:true}).click();
+  await expect(record).toHaveValue(/ייתכנו כאבים/u);
+  await expect(record).not.toHaveValue(/צורך בטיפול שורש/u);
+  acceptNextDialog(page);await page.getByRole("button",{name:"Объяснена возможная необходимость лечения корневых каналов",exact:true}).click();
+  await expect(record).toHaveValue(/צורך בטיפול שורש/u);
+});
+
+test("performed treatment persists locally and never creates an appointment or code",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"47",exact:true}).click();
+  await page.getByRole("button",{name:"Проведённое лечение",exact:true}).click();
+  acceptNextDialog(page);await page.getByRole("button",{name:/Временная пломба/u}).click();
+  await expect(page.getByText("Нет приемов для расписания",{exact:true})).toBeVisible();
+  await expect(page.getByLabel("MaccabiDent codes review")).toContainText("Нет подтвержденных кодов");
+  await page.getByRole("button",{name:"Сохранить локально",exact:true}).click();
+  await page.reload();await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"Загрузить локальный черновик",exact:true}).click();
+  await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/שחזור זמני בשן 47/u);
+});
+
+test("manual section editing remains live with performed-treatment source changes",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"36",exact:true}).click();
+  await page.getByRole("button",{name:"Проведённое лечение",exact:true}).click();
+  acceptNextDialog(page);await page.getByRole("button",{name:/Постоянная композитная пломба/u}).click();
+  await page.getByRole("button",{name:"Редактировать раздел טיפול שבוצע"}).click();
+  await page.getByLabel("Текст раздела טיפול שבוצע").fill("טיפול שבוצע ונערך ידנית.");
+  await page.getByRole("button",{name:"Сохранить раздел"}).click();
+  await page.getByRole("button",{name:"37",exact:true}).click();
+  acceptNextDialog(page);await page.getByRole("button",{name:/Постоянная композитная пломба/u}).click();
+  await expect(page.getByText(/Экспорт заблокирован/u)).toBeVisible();
+  await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/טיפול שבוצע ונערך ידנית/u);
+});
 test("chart, multi-select, sample case and Hebrew preview work",async({page})=>{
   await page.goto("/");
   await expect(page.getByRole("heading",{name:"Dental Notes AI"})).toBeVisible();
@@ -176,7 +259,7 @@ test("dentist can prescribe exact Augmentin strengths and explicitly confirm a p
 
 test("complaint tab supports bulk assignment and tooth-level isolation with live Hebrew output",async({page})=>{
   await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
-  await expect(page.locator("button.chip.whitespace-nowrap")).toHaveText(["Жалобы","Находки","Лечение","Консультации и направления","Первая помощь","Снимки","Альтернативы","Лаборатория","Лекарства","Коды Maccabi"]);
+  await expect(page.locator("button.chip.whitespace-nowrap")).toHaveText(["Жалобы","Находки","Лечение","Проведённое лечение","Консультации и направления","Первая помощь","Снимки","Альтернативы","Лаборатория","Лекарства","Коды Maccabi"]);
   await page.getByRole("button",{name:"Жалобы",exact:true}).click();
   await page.getByRole("button",{name:"11",exact:true}).click();await page.getByRole("button",{name:"12",exact:true}).click();
   await page.getByRole("button",{name:"Боль при накусывании",exact:true}).click();

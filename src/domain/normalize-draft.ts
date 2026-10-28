@@ -1,4 +1,5 @@
 import type { ClinicalDraft } from "./types";
+import { getClinicalPhrase } from "./first-aid-catalog";
 
 const legacyConsultations:Record<string,NonNullable<ClinicalDraft["consultations"]>[number]["type"]>={"endo-consult":"endodontist","implant-consult":"implantologist","periodontal-consult":"periodontist",hygienist:"hygienist"};
 
@@ -19,6 +20,9 @@ export function normalizeDraft(input: ClinicalDraft): ClinicalDraft {
   draft.generalComplaints ??= [];
   draft.consultations ??= [];
   draft.regionalClinicalFindings ??= [];
+  draft.performedActs ??= [];
+  draft.clinicalDiscussions ??= [];
+  draft.legacyPerformedSources ??= [];
   draft.revision ??= 0;
   const migrateTreatment=(treatment:ClinicalDraft["generalTreatments"][number])=>{const type=legacyConsultations[treatment.kind];if(!type)return false;if(!draft.consultations!.some(item=>item.id===treatment.id))draft.consultations!.push({id:treatment.id,type,target:treatment.tooth?{kind:"teeth",teeth:[treatment.tooth]}:treatment.jaw?{kind:"jaw",jaw:treatment.jaw}:{kind:"plan"},reasons:[],status:treatment.status==="planned"?"scheduled":treatment.status==="completed"?"completed":treatment.status==="refused"||treatment.status==="cancelled"?"refused":"recommended",completionConfirmed:treatment.status==="completed"});return true};
   Object.values(draft.teeth).forEach(tooth=>{tooth.treatments=tooth.treatments.filter(treatment=>!migrateTreatment(treatment))});
@@ -27,5 +31,9 @@ export function normalizeDraft(input: ClinicalDraft): ClinicalDraft {
   const migrate=(items:NonNullable<ClinicalDraft["generalComplaints"]>)=>items.forEach(item=>{item.complaintId=complaintAliases[item.complaintId]??item.complaintId;if(item.region){const regions:Record<string,string>={"Верхняя челюсть":"upper","Нижняя челюсть":"lower","Справа":"upper-right","Слева":"upper-left","Передний отдел":"general","Область ВНЧС справа":"upper-right","Область ВНЧС слева":"upper-left","Слизистая полости рта":"general"};item.region=regions[item.region]??item.region}if(item.trigger&&!item.triggers)item.triggers=[item.trigger==="hot"?"heat":item.trigger];if(item.severity&&!item.intensity)item.intensity=item.severity});
   Object.values(draft.teeth).forEach(tooth=>{tooth.complaints??=[];migrate(tooth.complaints)});
   migrate(draft.regionalComplaints);migrate(draft.generalComplaints);
+  const link=(sourceType:"treatment"|"first-aid"|"lab-stage",sourceId:string)=>{const id=`legacy-${sourceType}-${sourceId}`;if(!draft.legacyPerformedSources!.some(item=>item.id===id))draft.legacyPerformedSources!.push({id,sourceType,sourceId})};
+  [...Object.values(draft.teeth).flatMap(tooth=>tooth.treatments),...draft.generalTreatments].filter(item=>item.status==="completed").forEach(item=>link("treatment",item.id));
+  draft.firstAidSelections.filter(item=>item.confirmed&&getClinicalPhrase(item.phraseId)?.section==="completed").forEach(item=>link("first-aid",item.phraseId));
+  draft.labOrders.flatMap(order=>order.stages).filter(stage=>stage.status==="completed"&&stage.clinicianConfirmed).forEach(stage=>link("lab-stage",stage.id));
   return draft;
 }

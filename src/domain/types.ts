@@ -263,6 +263,9 @@ export interface ClinicalDraft {
   generalComplaints?: ComplaintSelection[];
   consultations?: ConsultationReferral[];
   regionalClinicalFindings?: RegionalClinicalFinding[];
+  performedActs?: PerformedAct[];
+  clinicalDiscussions?: ClinicalDiscussion[];
+  legacyPerformedSources?: LegacyPerformedSource[];
   revision?: number;
   updatedAt?: string;
 }
@@ -274,6 +277,24 @@ export interface SectionOverride {
   originalGeneratedText: string;
   reviewed: boolean;
 }
+
+export type PerformedTarget=
+  |{type:"tooth";teeth:number[];surfacesByTooth?:Record<number,Surface[]>}
+  |{type:"jaw";jaw:Jaw}
+  |{type:"construction";constructionId:string;jaw:Jaw}
+  |{type:"region";regionId:string};
+interface PerformedActBase {id:string;target:PerformedTarget;visitId:string;performedAt?:string;status:"completed";clinicianConfirmed:true;sourceTreatmentIds?:string[];sourceLabStageIds?:string[];sourceFirstAidIds?:string[]}
+export type RestorativePerformedKind="caries-removal"|"old-filling-removal"|"composite-filling"|"temporary-filling"|"cavity-liner"|"occlusal-adjustment"|"finishing-polishing"|"anesthesia";
+export interface RestorativePerformedAct extends PerformedActBase {category:"restorative";kind:RestorativePerformedKind;material?:"Filtek"|"Profil"|"IRM"|"Ledermix"|"other";shade?:"A2"|"A3"|"other";cariesType?:"primary"|"secondary";deepCaries?:boolean;oldFillingRemoved?:boolean;anesthesia?:{used:true;agent?:string;amount?:string}}
+export type FixedPerformedKind="direct-core"|"fiber-post-core"|"cast-core"|"crown-preparation"|"crown-impression"|"temporary-crown-placement"|"crown-recementation"|"framework-try-in"|"pfz-try-in"|"seat-check"|"occlusion-contact-check"|"permanent-cementation";
+export interface FixedPerformedAct extends PerformedActBase {category:"fixed";kind:FixedPerformedKind;material?:string;shade?:"A2"|"A3"|"other";cement?:"Temp-Bond"|"Fuji"|"Ketac"|"U200"|"other";impressionTechnique?:"alginate"|"silicone"|"scan"}
+export type RemovablePerformedKind="primary-alginate-impression"|"custom-tray-impression"|"centric-relation"|"shade-selection"|"wax-try-in"|"denture-delivery"|"pressure-adjustment"|"soft-reline"|"hard-reline"|"flipper-impression"|"flipper-delivery"|"flipper-adjustment";
+export interface RemovablePerformedAct extends PerformedActBase {category:"removable";kind:RemovablePerformedKind;material?:string;shade?:"A2"|"A3"|"other";prosthesisType?:"flipper"|"partial-acrylic"|"partial-cast"|"complete"|"immediate-partial"|"immediate-complete"|"implant-supported";replacedTeeth?:number[]}
+export type EmergencyPerformedKind="pulp-dressing"|"cavity-opening"|"sharp-edge-smoothing"|"drainage"|"irrigation"|"denture-adjustment"|"interim-analgesic-care";
+export interface EmergencyPerformedAct extends PerformedActBase {category:"emergency";kind:EmergencyPerformedKind;material?:"IRM"|"Ledermix"|"Temp-Bond"|"Fuji"|"other"}
+export type PerformedAct=RestorativePerformedAct|FixedPerformedAct|RemovablePerformedAct|EmergencyPerformedAct;
+export interface ClinicalDiscussion {id:string;relatedActIds:string[];kind:"post-operative-pain"|"possible-rct"|"other";explicitlyExplained:true;clinicianConfirmed:true}
+export interface LegacyPerformedSource {id:string;sourceType:"treatment"|"first-aid"|"lab-stage";sourceId:string}
 
 export interface Appointment {
   id: string;
