@@ -54,6 +54,8 @@ describe("Hebrew grammar and deterministic clinical composition", () => {
     expect(generateHebrewRecord(draft)).toContain("הצללה רדיולוצנטית פריאפיקלית");
   });
 
+  it("documents explicitly confirmed absence of periapical tissue changes",()=>{const draft=emptyDraft();draft.imaging=[{id:"normal-pa",kind:"periapical",status:"reviewed",target:"שן 26",findings:["periapical-normal"]}];const text=generateHebrewRecord(draft);expect(text).toContain("צילום פריאפיקלי עבור שן 26 נבדק");expect(text).toContain("לא הודגמו שינויים ברקמות הפריאפיקליות")});
+
   it("documents only alternatives that were actually offered", () => {
     const draft = caseC();
     draft.alternatives.push({ id: "hidden", tooth: 27, label: "אפשרות שלא הוצגה", offered: false, feasible: true, risksExplained: false, prognosisDiscussed: false, decision: "pending" });

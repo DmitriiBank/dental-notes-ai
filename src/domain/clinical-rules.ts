@@ -2,6 +2,7 @@ import type { ClinicalDraft, ValidationIssue } from "./types";
 import { scheduleAppointments } from "./appointment-rules";
 import { selectMaccabiCodeCandidates } from "./maccabi-codes";
 import { validateStructuredEntities } from "./structured-validation";
+import { PERIAPICAL_NORMAL_FINDING, PERIAPICAL_PATHOLOGY_FINDINGS } from "./radiographic-catalog";
 
 export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
@@ -16,7 +17,10 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
     t.treatments.filter(treatment=>treatment.tooth!==undefined&&treatment.tooth!==t.number).forEach(treatment=>add(`tooth-mismatch-${t.number}-${treatment.id}`,"blocking",`Лечение сохранено у зуба ${t.number}, но внутри назначения указан зуб ${treatment.tooth}.`));
   });
   if (!d.examination.normalsConfirmed && [d.examination.extraoral, d.examination.softTissues, d.examination.occlusion, d.examination.periodontal].some(Boolean)) add("normals", "review", "Нормальные значения требуют подтверждения врача.");
-  d.imaging.forEach(x => { if (x.findings.length && x.status !== "reviewed") add(`image-${x.id}`, "blocking", "Рентгенологическое заключение допустимо только после просмотра исследования."); });
+  d.imaging.forEach(x => {
+    if (x.findings.length && x.status !== "reviewed") add(`image-${x.id}`, "blocking", "Рентгенологическое заключение допустимо только после просмотра исследования.");
+    if(x.findings.includes(PERIAPICAL_NORMAL_FINDING)&&x.findings.some(finding=>PERIAPICAL_PATHOLOGY_FINDINGS.has(finding)))add(`image-periapical-conflict-${x.id}`,"blocking","Нельзя одновременно указать отсутствие изменений и патологическую находку в периапикальных тканях.");
+  });
   d.alternatives.filter(a => a.decision === "selected" && !a.offered).forEach(a => add(`alt-${a.id}`, "blocking", "Выбранный пациентом вариант не отмечен как предложенный."));
   (d.patientDecisions ?? []).forEach(decision=>{
     const linked=treatmentsFor(d).some(item=>item.id===decision.offeredProcedureId)||d.imaging.some(item=>item.id===decision.offeredProcedureId)||d.firstAidSelections.some(item=>item.phraseId===decision.offeredProcedureId);

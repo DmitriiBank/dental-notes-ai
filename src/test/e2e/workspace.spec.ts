@@ -130,3 +130,19 @@ test("unsupported age eligibility is visibly needs_review and no suffix is inven
   await expect(page.getByText(/суффикс не добавлен/u)).toBeVisible();
   await expect(page.getByLabel("MaccabiDent codes review")).not.toContainText(/שקא1-75|13505-75/u);
 });
+
+test("reviewed imaging can document normal periapical tissues without contradictory pathology",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"26",exact:true}).click();
+  await page.getByRole("button",{name:"Снимки",exact:true}).click();
+  await page.getByRole("button",{name:"Добавить исследование",exact:true}).click();
+  await page.getByLabel("Статус снимка").selectOption("reviewed");
+  const normal=page.getByRole("button",{name:"Без изменений в периапикальных тканях",exact:true});
+  await normal.click();
+  const record=page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveValue(/לא הודגמו שינויים ברקמות הפריאפיקליות/u);
+  await page.getByRole("button",{name:"Периапикальное просветление",exact:true}).click();
+  await expect(normal).toHaveAttribute("aria-pressed","false");
+  await expect(record).not.toHaveValue(/לא הודגמו שינויים ברקמות הפריאפיקליות/u);
+  await expect(record).toHaveValue(/הצללה רדיולוצנטית פריאפיקלית/u);
+});
