@@ -58,7 +58,7 @@ function forTreatment(draft:ClinicalDraft,treatment:Treatment):MaccabiCodeCandid
   if(treatment.kind==="crown-removal"){
     if(treatment.removalMethod==="adapt-old-as-temporary")return[candidate(draft,treatment,CODES.oldCrownToTemporary,"needs-review","Подтвердите адаптацию старой коронки под временную.")];
     if(treatment.removalMethod==="cut-crown-or-bridge")return[candidate(draft,treatment,CODES.crownBridgeRemoval,"needs-review","Проверьте число единиц и условия услуги.")];
-    return[unresolved(draft,treatment,"Уточните метод: адаптация старой коронки или разрезание и снятие.")];
+    return[candidate(draft,treatment,CODES.crownBridgeRemoval,"needs-review","חכ: подтвердите разрезание и снятие коронки/единицы моста, до двух единиц. Если адаптация старой коронки под временную — выберите соответствующий метод.")];
   }
   if(treatment.kind==="sinus-lift"){
     if(treatment.sinusLiftMethod==="open")return[candidate(draft,{...treatment,provider:"external"},CODES.sinusOpen,"needs-review","Тариф без кости и мембраны; проверьте исполнителя.")];
@@ -95,9 +95,9 @@ function forTreatment(draft:ClinicalDraft,treatment:Treatment):MaccabiCodeCandid
   }
   if(treatment.kind==="multi-unit")return[candidate(draft,treatment,CODES.multiUnit,"needs-review","Проверьте контекст конкретной имплантной конструкции.")];
   if(treatment.kind==="fiber-core")return[candidate(draft,treatment,CODES.fiberCore)];
-  if(treatment.kind==="core")return[candidate(draft,treatment,CODES.immediateCore,"needs-review","Уточните тип מבנה."),candidate(draft,treatment,CODES.immediateCorePin,"needs-review","Уточните наличие пина."),candidate(draft,treatment,CODES.castCore,"needs-review","Выберите только для литого металлического מבנה.")];
+  if(treatment.kind==="core")return[candidate(draft,treatment,CODES.immediateCore,"needs-review","מבנה מיידי. Проверьте применимость тарифа; для пина или литого מבנה выберите специальную процедуру.")];
   if(treatment.kind==="crown-recement")return[candidate(draft,treatment,CODES.crownRecement,"needs-review","Проверьте условия первой помощи и количество опорных единиц до трех.")];
-  if(treatment.kind==="night-guard")return[candidate(draft,treatment,CODES.nightGuard)];
+  if(treatment.kind==="night-guard")return[candidate(draft,treatment,CODES.nightGuard),{...candidate(draft,treatment,CODES.studyModels,"needs-review","תל: рабочие модели на одну челюсть. Проверьте факт изготовления и возможность отдельного учёта."),treatmentId:`${treatment.id}:study-models`,selected:false}];
   if(treatment.kind==="partial-denture")return[candidate(draft,treatment,CODES.castPartial,"needs-review","Уточните конструкцию: литая или временная акриловая."),candidate(draft,treatment,CODES.acrylicPartial,"needs-review","Уточните конструкцию: литая или временная акриловая.")];
   if(treatment.kind==="immediate-denture")return[candidate(draft,treatment,CODES.immediateFull,"needs-review","Проверьте, что это именно полный немедленный переходный протез.")];
   if(treatment.kind==="complete-denture")return[candidate(draft,treatment,CODES.completeDenture)];
