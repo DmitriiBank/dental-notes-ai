@@ -31,6 +31,8 @@ export interface Treatment {
   material?: string;
   shade?: string;
   provider?: "self" | "external";
+  jaw?: Jaw;
+  quantity?: number;
 }
 
 export interface Alternative {
@@ -75,6 +77,8 @@ export interface ClinicalDraft {
   edentulous: Jaw[];
   customDurations: Record<string, number>;
   firstAidSelections: FirstAidSelection[];
+  selectedMaccabiCodes: Record<string, string>;
+  eligibility: { ageGroup: "unknown" | "under18" | "adult" | "over75" | "over80"; contractCategory?: string; verified: boolean };
   updatedAt?: string;
 }
 
@@ -103,4 +107,21 @@ export interface FirstAidSelection {
   phraseId: string;
   vars: TemplateVariables;
   confirmed: boolean;
+}
+
+export type CodeVerificationStatus = "verified-snapshot" | "needs-review" | "unverified";
+
+export interface MaccabiCodeCandidate {
+  treatmentId: string;
+  shortCode: string;
+  catalogNumber: string;
+  descriptionHe: string;
+  sourceVersion: string;
+  procedureStatus: ProcedureStatus;
+  providerRole: "self" | "external";
+  verificationStatus: CodeVerificationStatus;
+  toothOrJaw: string;
+  quantity: number;
+  selected: boolean;
+  clarification?: string;
 }

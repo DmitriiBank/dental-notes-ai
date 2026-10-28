@@ -49,6 +49,12 @@ The domain layer has no React, server, AI, or network dependency. `hebrew-catalo
 
 The **Первая помощь** tab uses the currently selected FDI tooth and its selected surfaces. A scenario only opens a checklist; it never inserts a diagnosis or performed treatment automatically. Complaint, finding, performed procedure, recommendation, and counseling phrases must each be selected explicitly. Region-dependent phrases also require a region value. Every accepted phrase updates the Hebrew preview immediately.
 
+## MaccabiDent code review
+
+`src/domain/data/maccabi-catalog-v2026-07-15.ts` stores machine-readable mappings from the supplied contract appendix. The unchanged source is retained in `references/maccabident_codes_main_2026-07-15.md`. `maccabi-codes.ts` derives candidates from assigned procedures without affecting appointment scheduling. Every candidate carries code, catalog number, Hebrew description, tooth/jaw, quantity, procedure status, provider role, source version, and verification status. Ambiguous mappings remain unselected until the clinician chooses one; unsupported mappings display `UNVERIFIED`.
+
+Regression traceability and deliberately uncovered cases are documented in [REGRESSION_STATUS.md](./REGRESSION_STATUS.md). Pending IDs are not emitted as passing tests.
+
 ## Safety and privacy
 
 - No database, analytics, external AI calls, or clinical logging.

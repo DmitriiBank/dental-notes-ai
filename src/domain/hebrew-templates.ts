@@ -46,7 +46,7 @@ function imagingSentence(imaging: Imaging): string {
 }
 
 function treatmentText(treatment: Treatment): string {
-  const target = treatment.tooth ? `בשן ${treatment.tooth} ` : "";
+  const target = treatment.tooth ? `בשן ${treatment.tooth} ` : treatment.jaw === "upper" ? "ללסת העליונה " : treatment.jaw === "lower" ? "ללסת התחתונה " : "";
   const details = [treatment.material ? `חומר ${treatment.material}` : "", treatment.shade ? `גוון ${treatment.shade}` : ""].filter(Boolean);
   return `${target}${phrase(HEBREW_TREATMENTS, treatment.kind)}${details.length ? `, ${details.join(", ")}` : ""}`;
 }

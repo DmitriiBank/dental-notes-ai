@@ -16,7 +16,7 @@ export const TREATMENTS = [
   ["observation", "Наблюдение"], ["rct", "Лечение каналов"], ["retreatment", "Перелечивание каналов"],
   ["endo-consult", "Консультация эндодонтиста"], ["core", "מבנה"], ["fiber-core", "Стекловолоконный штифт и מבנה"],
   ["temporary-crown", "Временная коронка"], ["zirconia-crown", "Циркониевая коронка"], ["permanent-crown", "Другая постоянная коронка"], ["crown-recement", "Фиксация коронки"], ["crown-removal", "Снятие коронки"],
-  ["bridge", "Мост"], ["bridge-replacement", "Замена моста"], ["implant-crown", "Коронка на импланте"], ["implant-bridge", "Мост на имплантах"], ["flipper", "Временный флиппер"],
+  ["bridge", "Мост"], ["bridge-replacement", "Замена моста"], ["implant-crown", "Коронка на импланте"], ["implant-core", "מבנה на импланте"], ["implant-bridge", "Мост на имплантах"], ["multi-unit", "Multi-Unit"], ["night-guard", "Жесткая ночная каппа"], ["flipper", "Временный флиппер"],
   ["extraction", "Удаление другим врачом"], ["surgical-extraction", "Хирургическое удаление"], ["implant-consult", "Консультация по имплантации"],
   ["implant-placement", "Установка импланта"], ["bone-augmentation", "Костная пластика"], ["sinus-lift", "Синус-лифтинг"], ["periodontal-consult", "Консультация пародонтолога"], ["hygienist", "Гигиенист"], ["complete-denture", "Полный съемный протез"],
   ["partial-denture", "Частичный съемный протез"], ["immediate-denture", "Иммедиат-протез"], ["reinforced-denture", "Протез с металлической сеткой"], ["overdenture", "Покрывной протез на имплантах"], ["relining", "Перебазировка"], ["denture-adjustment", "Коррекция протеза"], ["denture-remake", "Переделка протеза"]

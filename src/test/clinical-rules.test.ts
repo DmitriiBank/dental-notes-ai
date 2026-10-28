@@ -9,4 +9,6 @@ describe("clinical validation",()=>{
   it("flags unconfirmed normal presets",()=>{const d=emptyDraft();d.examination.extraoral='במ"פ.';expect(validateDraft(d).some(x=>x.id==="normals")).toBe(true)});
   it("deep caries text is conditional and does not assert pulpitis",()=>{const text=generateHebrewRecord(caseB());expect(text).toContain("ייתכן צורך בטיפול שורש");expect(text).toContain("ללא אבחנה אנדודונטית סופית")});
   it("uses straight quotation marks",()=>expect(generateHebrewRecord(emptyDraft())).not.toMatch(/[“”]/));
+  it("blocks a treatment whose embedded tooth does not match its chart location",()=>{const d=emptyDraft();d.teeth[11].treatments=[{id:"wrong",kind:"filling",status:"planned",tooth:12,surfaces:["M"]}];expect(validateDraft(d)).toEqual(expect.arrayContaining([expect.objectContaining({id:"tooth-mismatch-11-wrong",severity:"blocking"})]))});
+  it("requires clinician review for ambiguous or unverified codes",()=>{const d=emptyDraft();d.teeth[12].treatments=[{id:"z",kind:"zirconia-crown",status:"planned",tooth:12}];expect(validateDraft(d).some(x=>x.id==="code-choice-z")).toBe(true);d.selectedMaccabiCodes.z="כחלז";expect(validateDraft(d).some(x=>x.id==="code-choice-z")).toBe(false)});
 });
