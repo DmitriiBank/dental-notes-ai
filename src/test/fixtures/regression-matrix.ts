@@ -1,8 +1,9 @@
 export type RegressionDomain="exam"|"fillings"|"prosthetics"|"emergency"|"quality"|"codes";
-export interface RegressionFixture { id:string; domain:RegressionDomain; scenario:string; synthetic:true; invariants:string[]; status:"automated"|"pending"; testRef?:string; pendingReason?:string }
+export type PendingCategory="missing-application-functionality"|"missing-test-implementation"|"missing-fixture"|"unresolved-clinical-rules";
+export interface RegressionFixture { id:string; domain:RegressionDomain; scenario:string; synthetic:true; invariants:string[]; status:"automated"|"pending"; testRef?:string; pendingReason?:string; pendingCategory?:PendingCategory }
 
 const COMMON=["structured-fdi","section-separation","single-paragraph-plan","deterministic-appointments","no-invented-consent"];
-type BaseFixture=Omit<RegressionFixture,"status"|"testRef"|"pendingReason">;
+type BaseFixture=Omit<RegressionFixture,"status"|"testRef"|"pendingReason"|"pendingCategory">;
 const parse=(domain:RegressionDomain,source:string):BaseFixture[]=>source.trim().split("\n").map(line=>{const [id,scenario,...invariants]=line.split("|");return{id,domain,scenario,synthetic:true,invariants:[...COMMON,...invariants]}});
 
 const BASE_FIXTURES:BaseFixture[]=[
@@ -102,14 +103,28 @@ CD15|Версия и актуальность прайса|source-version-warnin
 ];
 
 const AUTOMATED:Record<string,string>={
-  EX01:"clinical-rules.test.ts",EX09:"hebrew-templates.test.ts",EX10:"hebrew-templates.test.ts",
-  FL03:"appointment-rules.test.ts",FL06:"appointment-rules.test.ts",FL08:"clinical-rules.test.ts",
-  PR02:"appointment-rules.test.ts",PR05:"first-aid-catalog.test.ts",PR08:"appointment-rules.test.ts",PR11:"appointment-rules.test.ts",PR14:"appointment-rules.test.ts",PR17:"appointment-rules.test.ts",PR19:"clinical-rules.test.ts",PR20:"maccabi-codes.test.ts",
-  ER03:"first-aid-catalog.test.ts",ER05:"first-aid-catalog.test.ts",ER10:"maccabi-codes.test.ts",
-  QA04:"hebrew-templates.test.ts",QA08:"clinical-rules.test.ts",QA09:"hebrew-templates.test.ts",QA11:"clinical-rules.test.ts",QA14:"hebrew-templates.test.ts",
+  EX01:"clinical-rules.test.ts",EX02:"regression-clinical-scenarios.test.ts",EX03:"regression-clinical-scenarios.test.ts",EX04:"regression-clinical-scenarios.test.ts",EX05:"regression-clinical-scenarios.test.ts",EX06:"regression-clinical-scenarios.test.ts",EX07:"regression-clinical-scenarios.test.ts",EX08:"regression-clinical-scenarios.test.ts",EX09:"hebrew-templates.test.ts",EX10:"hebrew-templates.test.ts",
+  FL01:"regression-clinical-scenarios.test.ts",FL02:"regression-clinical-scenarios.test.ts",FL03:"appointment-rules.test.ts",FL04:"regression-clinical-scenarios.test.ts",FL05:"regression-clinical-scenarios.test.ts",FL06:"appointment-rules.test.ts",FL07:"regression-clinical-scenarios.test.ts",FL08:"clinical-rules.test.ts",FL09:"regression-clinical-scenarios.test.ts",FL10:"regression-clinical-scenarios.test.ts",
+  PR01:"regression-clinical-scenarios.test.ts",PR02:"appointment-rules.test.ts",PR04:"regression-clinical-scenarios.test.ts",PR05:"first-aid-catalog.test.ts",PR08:"appointment-rules.test.ts",PR09:"regression-clinical-scenarios.test.ts",PR10:"regression-clinical-scenarios.test.ts",PR11:"appointment-rules.test.ts",PR13:"regression-clinical-scenarios.test.ts",PR14:"appointment-rules.test.ts",PR15:"regression-clinical-scenarios.test.ts",PR17:"appointment-rules.test.ts",PR19:"clinical-rules.test.ts",PR20:"maccabi-codes.test.ts",
+  ER01:"regression-clinical-scenarios.test.ts",ER02:"regression-clinical-scenarios.test.ts",ER03:"first-aid-catalog.test.ts",ER04:"regression-clinical-scenarios.test.ts",ER05:"first-aid-catalog.test.ts",ER06:"regression-clinical-scenarios.test.ts",ER07:"regression-clinical-scenarios.test.ts",ER08:"regression-clinical-scenarios.test.ts",ER09:"regression-clinical-scenarios.test.ts",ER10:"maccabi-codes.test.ts",ER11:"regression-clinical-scenarios.test.ts",
+  QA01:"regression-clinical-scenarios.test.ts",QA03:"regression-clinical-scenarios.test.ts",QA04:"hebrew-templates.test.ts",QA05:"regression-clinical-scenarios.test.ts",QA08:"clinical-rules.test.ts",QA09:"hebrew-templates.test.ts",QA10:"regression-clinical-scenarios.test.ts",QA11:"clinical-rules.test.ts",QA12:"regression-clinical-scenarios.test.ts",QA13:"regression-clinical-scenarios.test.ts",QA14:"hebrew-templates.test.ts",
   CD01:"maccabi-codes.test.ts",CD02:"maccabi-codes.test.ts",CD03:"maccabi-codes.test.ts",CD04:"maccabi-codes.test.ts",CD05:"maccabi-codes.test.ts",CD06:"maccabi-codes.test.ts",CD07:"maccabi-codes.test.ts",CD08:"maccabi-codes.test.ts",CD09:"maccabi-codes.test.ts",CD10:"maccabi-codes.test.ts",CD11:"maccabi-codes.test.ts",CD13:"maccabi-codes.test.ts",CD14:"maccabi-codes.test.ts",CD15:"maccabi-codes.test.ts",
+};
+
+const PENDING:Record<string,{category:PendingCategory;reason:string}>={
+  PR03:{category:"missing-application-functionality",reason:"Нет отдельной модели зависимости: подтвержденные оттиски для немедленного флипера должны предшествовать внешнему удалению."},
+  PR06:{category:"missing-application-functionality",reason:"Нет типизированной модели мостов: диапазон, опоры, промежуточные части, временная конструкция и снятие старой работы."},
+  PR07:{category:"missing-application-functionality",reason:"Нет сущности моста, позволяющей назначить подвижность конструкции без распространения на все опоры."},
+  PR12:{category:"missing-application-functionality",reason:"Нет лабораторного заказа с дефектами флипера и вестибулярной пластинки."},
+  PR16:{category:"unresolved-clinical-rules",reason:"Не заданы проверенные конструкционные ограничения и кодирование моста с двумя понтиками; код нельзя выбирать по догадке."},
+  PR18:{category:"missing-application-functionality",reason:"Нет dependency-модели остеоинтеграции и условного срока ортопедического этапа после внешней имплантации."},
+  ER12:{category:"missing-application-functionality",reason:"Нет отдельного объекта отказа, связывающего конкретно предложенную экстренную помощь с рекомендациями после отказа."},
+  QA02:{category:"missing-application-functionality",reason:"Нет структурированных полей неизвестных препаратов и blocking/review gate перед инвазивным лечением при остеопорозе."},
+  QA06:{category:"missing-application-functionality",reason:"Нет лабораторного заказа и сверки зуба, типа опоры, конструкции и заказанного изделия."},
+  QA07:{category:"missing-application-functionality",reason:"Нет неподтвержденного mentor checklist для примерки металла и окклюзионной регистрации."},
+  CD12:{category:"unresolved-clinical-rules",reason:"Справочник исключает возрастные/льготные/договорные варианты; надежные правила суффиксов -18/-75/-80 не предоставлены."},
 };
 
 export const REGRESSION_FIXTURES:RegressionFixture[]=BASE_FIXTURES.map(fixture=>AUTOMATED[fixture.id]
   ?{...fixture,status:"automated",testRef:AUTOMATED[fixture.id]}
-  :{...fixture,status:"pending",pendingReason:"Требуется отдельная полностью структурированная клиническая fixture и семантические assertions; наличие ID не считается прохождением."});
+  :{...fixture,status:"pending",pendingCategory:PENDING[fixture.id]?.category??"missing-test-implementation",pendingReason:PENDING[fixture.id]?.reason??"Нет полного семантического теста; наличие ID не считается прохождением."});

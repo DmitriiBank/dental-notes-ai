@@ -39,6 +39,7 @@ function toothFindingSentence(tooth: ToothState): string | null {
 function imagingSentence(imaging: Imaging): string {
   const label = IMAGING_LABELS[imaging.kind] ?? imaging.kind;
   const target = imaging.target ? ` עבור ${imaging.target}` : "";
+  if (imaging.status === "refused") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}; הוסבר כי ללא הבדיקה יכולת האבחון מוגבלת`);
   if (imaging.status !== "reviewed") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}`);
   const findingText = unique(imaging.findings).map(key => phrase(HEBREW_FINDINGS, key));
   const details = [hebrewList(findingText), imaging.notes].filter(Boolean).join("; ");
