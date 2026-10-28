@@ -90,6 +90,7 @@ test("dentist can define a temporary mobile bridge without marking abutments mob
   for(const tooth of [15,16,17])await page.getByRole("button",{name:String(tooth),exact:true}).click();
   await page.getByRole("button",{name:"Лечение",exact:true}).click();
   await page.getByRole("button",{name:/^Мост/u}).first().click();
+  await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/גשר משן 15 עד שן 17/u);
   await page.getByRole("button",{name:"Лаборатория",exact:true}).click();
   await page.getByRole("button",{name:"Добавить мост",exact:true}).click();
   await page.getByLabel("Материал конструкции").fill("zirconia");

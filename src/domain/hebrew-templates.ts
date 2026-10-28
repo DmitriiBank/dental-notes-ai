@@ -53,6 +53,43 @@ function treatmentText(treatment: Treatment): string {
   return `${target}${phrase(HEBREW_TREATMENTS, treatment.kind)}${details.length ? `, ${details.join(", ")}` : ""}`;
 }
 
+const BRIDGE_TREATMENTS = new Set(["bridge", "bridge-replacement", "implant-bridge"]);
+const treatmentGroupKey = (treatment: Treatment) => JSON.stringify({
+  kind: treatment.kind,
+  status: treatment.status,
+  material: treatment.material ?? "",
+  shade: treatment.shade ?? "",
+  provider: treatment.provider ?? "self",
+  jaw: treatment.jaw ?? "",
+  stage: treatment.stage ?? null,
+});
+
+function groupTreatments(treatments: Treatment[]): Treatment[][] {
+  const groups = new Map<string, Treatment[]>();
+  const standalone: Treatment[][] = [];
+  treatments.forEach(treatment => {
+    if (treatment.tooth === undefined) {
+      standalone.push([treatment]);
+      return;
+    }
+    const key = treatmentGroupKey(treatment);
+    groups.set(key, [...(groups.get(key) ?? []), treatment]);
+  });
+  return [...groups.values(), ...standalone];
+}
+
+function groupedTreatmentText(group: Treatment[]): string {
+  const treatment = group[0];
+  const teeth = unique(group.map(item => item.tooth).filter((tooth): tooth is number => tooth !== undefined)).sort((a, b) => a - b);
+  if (teeth.length <= 1) return treatmentText(treatment);
+  const details = [treatment.material ? `חומר ${treatment.material}` : "", treatment.shade ? `גוון ${treatment.shade}` : ""].filter(Boolean);
+  const procedure = phrase(HEBREW_TREATMENTS, treatment.kind);
+  const target = BRIDGE_TREATMENTS.has(treatment.kind)
+    ? `${procedure} משן ${teeth[0]} עד שן ${teeth.at(-1)}`
+    : `${procedure} בשיניים ${hebrewList(teeth.map(String))}`;
+  return `${target}${details.length ? `, ${details.join(", ")}` : ""}`;
+}
+
 function alternativeText(alternative: Alternative): string | null {
   if (!alternative.offered || !alternative.label.trim()) return null;
   const target = alternative.tooth ? `לשן ${alternative.tooth} ` : "";
@@ -103,13 +140,13 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
 
   const allTreatments = [...Object.values(draft.teeth).flatMap(tooth => tooth.treatments), ...draft.generalTreatments];
   const completed = allTreatments.filter(treatment => treatment.status === "completed");
-  const completedText = [...completed.map(treatmentText).map(sentence), ...(firstAid.get("completed") ?? [])];
+  const completedText = [...groupTreatments(completed).map(groupedTreatmentText).map(sentence), ...(firstAid.get("completed") ?? [])];
   (draft.labOrders ?? []).flatMap(order => order.stages).map(completedLabStageText).filter((value): value is string => Boolean(value)).forEach(value => completedText.push(value));
   if (completedText.length) sections.push(`טיפול שבוצע:\n${unique(completedText).join(" ")}`);
 
   const plan: string[] = [];
-  allTreatments.filter(treatment => treatment.status !== "completed" && treatment.status !== "cancelled").forEach(treatment => {
-    plan.push(`${TREATMENT_STATUS[treatment.status]} ${treatmentText(treatment)}`);
+  groupTreatments(allTreatments.filter(treatment => treatment.status !== "completed" && treatment.status !== "cancelled")).forEach(group => {
+    plan.push(`${TREATMENT_STATUS[group[0].status]} ${groupedTreatmentText(group)}`);
   });
   draft.alternatives.map(alternativeText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
   (draft.labConstructions ?? []).map(labConstructionText).forEach(value => plan.push(value));

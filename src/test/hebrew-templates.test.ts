@@ -87,6 +87,9 @@ describe("Hebrew grammar and deterministic clinical composition", () => {
     expect(output).not.toContain("תור 1");
     expect(output).not.toContain("30 דקות");
   });
+  it("groups identical procedures into one treatment phrase with a tooth list",()=>{const draft=emptyDraft();[14,15,16].forEach(tooth=>draft.teeth[tooth].treatments=[{id:`extract-${tooth}`,kind:"extraction",status:"recommended",tooth,provider:"external"}]);const plan=generateHebrewRecord(draft).split("תוכנית טיפול והמלצות:\n")[1];expect(plan).toContain("עקירה אצל רופא אחר בשיניים 14, 15 ו16");expect(plan.match(/עקירה/gu)).toHaveLength(1)});
+  it("groups endodontic treatment without implying it was completed",()=>{const draft=emptyDraft();[36,37].forEach(tooth=>draft.teeth[tooth].treatments=[{id:`rct-${tooth}`,kind:"rct",status:"recommended",tooth,provider:"external"}]);const text=generateHebrewRecord(draft);expect(text).toContain("הומלץ טיפול שורש בשיניים 36 ו37");expect(text).not.toContain("טיפול שבוצע")});
+  it("renders one bridge span instead of repeating a bridge for every tooth",()=>{const draft=emptyDraft();[15,16,17].forEach(tooth=>draft.teeth[tooth].treatments=[{id:`bridge-${tooth}`,kind:"bridge",status:"planned",tooth,material:"zirconia"}]);const plan=generateHebrewRecord(draft).split("תוכנית טיפול והמלצות:\n")[1];expect(plan).toContain("גשר משן 15 עד שן 17, חומר zirconia");expect(plan.match(/גשר/gu)).toHaveLength(1)});
 
   it("uses only straight quotation marks", () => {
     const draft = emptyDraft();
