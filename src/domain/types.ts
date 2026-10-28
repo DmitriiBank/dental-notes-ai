@@ -254,6 +254,9 @@ export interface ClinicalDraft {
   implants: ImplantState[];
   imaging: Imaging[];
   alternatives: Alternative[];
+  treatmentOptions?: {first:string;second:string;decision?:"no-treatment"|"first"|"second";confirmed:boolean};
+  alternativeTreatments?: Treatment[];
+  labLetters?: Array<{id:string;teeth:number[];text:string}>;
   generalTreatments: Treatment[];
   edentulous: Jaw[];
   customDurations: Record<string, number>;

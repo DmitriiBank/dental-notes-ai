@@ -14,6 +14,7 @@ import { complaintSentences } from "./complaint-catalog";
 import { consultationText } from "./consultation-catalog";
 import { aggregateClinicalFindings, toothSpecificClinicalDetails } from "./clinical-presentation";
 import { discussionText, groupedPerformedTexts } from "./performed-treatment";
+import {generateLabLetter} from "./lab-letter";
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const sentence = (value: string) => `${value.trim().replace(/[.;]+$/u, "")}.`;
@@ -152,10 +153,11 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   recommendedDetails.map(sentence).forEach(value=>plan.push(value));
   recommendedMedicationLines.forEach(value=>plan.push(value));
   (draft.consultations??[]).map(consultationText).filter((value):value is string=>Boolean(value)).forEach(value=>plan.push(value));
-  groupTreatments(allTreatments.filter(treatment => treatment.status !== "completed" && treatment.status !== "cancelled")).forEach(group => {
-    plan.push(`${TREATMENT_STATUS[group[0].status]} ${groupedTreatmentText(group)}`);
-  });
-  draft.alternatives.map(alternativeText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
+  const firstPlan=groupTreatments(allTreatments.filter(treatment => treatment.status !== "completed" && treatment.status !== "cancelled")).map(group=>`${TREATMENT_STATUS[group[0].status]} ${groupedTreatmentText(group)}`);
+  const secondPlan=groupTreatments((draft.alternativeTreatments??[]).filter(treatment=>treatment.status!=="cancelled")).map(group=>groupedTreatmentText(group));
+  if(secondPlan.length){if(firstPlan.length)plan.push(`תוכנית טיפול 1: ${firstPlan.join("; ")}`);plan.push(`תוכנית טיפול 2: ${secondPlan.join("; ")}`)}else plan.push(...firstPlan);
+  if(draft.treatmentOptions?.confirmed){const o=draft.treatmentOptions;if(!secondPlan.length&&o.first.trim())plan.push(`אפשרות טיפול ראשונה: ${o.first.trim()}`);if(!secondPlan.length&&o.second.trim())plan.push(`אפשרות טיפול שנייה: ${o.second.trim()}`);if(o.decision==="no-treatment")plan.push("המטופל אינו מעוניין בטיפול בשלב זה");if(o.decision==="first"&&o.first.trim())plan.push("המטופל בחר באפשרות הטיפול הראשונה");if(o.decision==="second"&&(secondPlan.length||o.second.trim()))plan.push("המטופל בחר באפשרות הטיפול השנייה");}
+  else draft.alternatives.map(alternativeText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
   (draft.labConstructions ?? []).map(labConstructionText).forEach(value => plan.push(value));
   (draft.labOrders ?? []).map(labOrderRemakeText).filter((value): value is string => Boolean(value)).forEach(value=>plan.push(value));
   (draft.labOrders ?? []).map(labOrderInstructionText).filter((value): value is string => Boolean(value)).forEach(value=>plan.push(value));
@@ -164,5 +166,7 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   plan.push(...(firstAid.get("recommendation") ?? []), ...(firstAid.get("counseling") ?? []));
   if (plan.length) sections.push(`תוכנית טיפול והמלצות:\n${sentence(unique(plan).map(value=>value.trim().replace(/[.;]+$/u,"")).join("; "))}`);
 
+  const letters=(draft.labLetters??[]).map(letter=>generateLabLetter(draft,letter.teeth,letter.text)).filter(Boolean);
+  if(letters.length)sections.push(`הוראות למעבדה:\n${letters.join("\n")}`);
   return cleanOutput(sections.join("\n\n"));
 }
