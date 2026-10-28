@@ -1,14 +1,16 @@
 import type { Appointment, ClinicalDraft, Treatment } from "./types";
 import { areAdjacent, sameSide } from "./teeth";
 
-const EXTERNAL = new Set(["extraction", "surgical-extraction", "rct", "retreatment", "endo-consult", "implant-consult", "implant-placement", "hygienist"]);
+const EXTERNAL = new Set(["extraction", "surgical-extraction", "rct", "retreatment", "endo-consult", "implant-consult", "implant-placement", "bone-augmentation", "sinus-lift", "periodontal-consult", "hygienist"]);
 const DENTURES = new Set(["complete-denture", "partial-denture"]);
 
 export function scheduleAppointments(draft: ClinicalDraft): Appointment[] {
   const all = [...Object.values(draft.teeth).flatMap(t => t.treatments), ...draft.generalTreatments]
-    .filter(t => ["recommended", "planned"].includes(t.status) && !EXTERNAL.has(t.kind));
+    .filter(t => ["recommended", "planned"].includes(t.status) && t.provider !== "external" && !EXTERNAL.has(t.kind));
   const result: Appointment[] = [];
+  const scheduledTreatmentIds = new Set<string>();
   const fillings = all.filter(t => ["filling", "filling-replacement"].includes(t.kind) && t.tooth) as (Treatment & {tooth:number})[];
+  fillings.forEach(t => scheduledTreatmentIds.add(t.id));
   const buccal = fillings.filter(f => f.buccalOnly || (f.surfaces?.length === 1 && f.surfaces[0] === "B"));
   const standard = fillings.filter(f => !buccal.includes(f));
 
@@ -25,10 +27,18 @@ export function scheduleAppointments(draft: ClinicalDraft): Appointment[] {
     result.push({ id: `buccal-${i}`, duration, source: "buccal-fillings", editable: true });
   }
 
-  all.filter(t => t.kind === "core").forEach((_, i) => result.push({ id: `core-${i}`, duration: 30, source: "core", editable: false }));
-  const dentureCount = all.filter(t => DENTURES.has(t.kind)).length;
+  all.filter(t => t.kind === "core").forEach((t, i) => { scheduledTreatmentIds.add(t.id); result.push({ id: `core-${i}`, duration: 30, source: "core", editable: false }); });
+  const dentureTreatments = all.filter(t => DENTURES.has(t.kind));
+  dentureTreatments.forEach(t => scheduledTreatmentIds.add(t.id));
+  const dentureCount = dentureTreatments.length;
   if (dentureCount) [30,30,60,30,30].forEach((duration, i) => result.push({ id: `denture-${i}`, duration, source: "denture", editable: false }));
-  all.filter(t => t.kind === "immediate-denture" && t.stage && t.stage > 1).forEach((t, i) => result.push({ id: `immediate-${i}`, duration: null, source: t.kind, editable: true }));
+  all.filter(t => t.kind === "immediate-denture").forEach((t, i) => {
+    scheduledTreatmentIds.add(t.id);
+    if (t.stage && t.stage > 1) result.push({ id: `immediate-${i}`, duration: null, source: t.kind, editable: true });
+  });
+  all.filter(t => !scheduledTreatmentIds.has(t.id) && t.kind !== "observation").forEach(t => {
+    result.push({ id: `unconfigured-${t.id}`, duration: null, source: t.kind, editable: true });
+  });
   return result.map(a => ({ ...a, duration: draft.customDurations[a.id] ?? a.duration }));
 }
 

@@ -1,0 +1,147 @@
+import type { ImagingStatus, ProcedureStatus } from "./types";
+
+export interface HebrewPhrase {
+  label: string;
+  gender?: "m" | "f";
+}
+
+export const HEBREW_FINDINGS: Record<string, HebrewPhrase> = {
+  "primary-caries": { label: "עששת ראשונית" },
+  "secondary-caries": { label: "עששת משנית" },
+  "deep-caries": { label: "עששת עמוקה" },
+  "cervical-caries": { label: "עששת צווארית" },
+  "root-caries": { label: "עששת שורש" },
+  "crown-destruction": { label: "הרס חלקי של הכותרת האנטומית" },
+  "subgingival-destruction": { label: "הרס מתחת לגובה החניכיים" },
+  "residual-root": { label: "שורש נותר" },
+  fracture: { label: "שבר בשן" },
+  crack: { label: "סדק בשן" },
+  chip: { label: "שבר חלקי של חומר השן" },
+  "cervical-lesion": { label: "נגע צווארי שאינו עששתי" },
+  wear: { label: "שחיקת שיניים" },
+  filling: { label: "שחזור קיים" },
+  "defective-filling": { label: "שחזור לקוי" },
+  "fractured-filling": { label: "שחזור שבור" },
+  "artificial-crown": { label: "כתר מלאכותי קיים" },
+  "defective-crown": { label: "כתר מלאכותי לקוי" },
+  "loose-crown": { label: "כתר רופף" },
+  "crown-with-root": { label: "הכתר נע יחד עם מבנה השן או השורש" },
+  "temporary-crown-existing": { label: "כתר זמני קיים" },
+  "bridge-abutment": { label: "מאחז גשר" },
+  "bridge-pontic": { label: "יחידת ביניים בגשר" },
+  "post-core": { label: "מבנה יצוק קיים" },
+  "fiber-post": { label: "פוסט סיבי קיים" },
+  mobility: { label: "ניידות שן" },
+  recession: { label: "נסיגת חניכיים" },
+  pocket: { label: "כיס פריודונטלי" },
+  inflammation: { label: "דלקת חניכיים" },
+  bleeding: { label: "דימום" },
+  "bone-loss": { label: "אובדן עצם" },
+  furcation: { label: "מעורבות פורקציה" },
+  "treated-canals": { label: "טיפול שורש קודם" },
+  "incomplete-rct": { label: "מילוי תעלות חסר" },
+  "suspected-endo": { label: "חשד לפתולוגיה אנדודונטית" },
+  periapical: { label: "הצללה רדיולוצנטית פריאפיקלית" },
+  "lateral-radiolucency": { label: "הצללה רדיולוצנטית לטרלית לשורש" },
+  "furcation-radiolucency": { label: "הצללה רדיולוצנטית באזור הפורקציה" },
+  fistula: { label: "פיסטולה" },
+  swelling: { label: "נפיחות" },
+  impacted: { label: "שן כלואה" },
+  "partially-impacted": { label: "שן כלואה חלקית" },
+  dystopic: { label: "שן דיסטופית" },
+  buccal: { label: "מיקום בוקאלי" },
+  "soft-tissue-trauma": { label: "פגיעה ברקמה רכה הנגרמת על ידי השן" },
+  "horizontal-bone-loss": { label: "אובדן עצם אופקי" },
+  "vertical-bone-loss": { label: "אובדן עצם אנכי" },
+  "implant-existing": { label: "שתל דנטלי קיים" },
+  "implant-supported-crown": { label: "כתר נתמך שתל קיים" },
+  "implant-supported-bridge": { label: "גשר נתמך שתלים קיים" },
+  "multi-unit": { label: "מבנה Multi-Unit קיים" },
+  "implant-mobility": { label: "ניידות שתל" },
+  "peri-implant-inflammation": { label: "דלקת סביב השתל" },
+  "peri-implant-bone-loss": { label: "אובדן עצם סביב השתל" },
+  "implant-missing": { label: "שתל חסר או הוסר" },
+};
+
+export const HEBREW_TREATMENTS: Record<string, HebrewPhrase> = {
+  filling: { label: "ביצוע שחזור" },
+  "filling-replacement": { label: "החלפת שחזור" },
+  "temporary-filling": { label: "שחזור זמני" },
+  observation: { label: "מעקב" },
+  rct: { label: "טיפול שורש" },
+  retreatment: { label: "חידוש טיפול שורש" },
+  "endo-consult": { label: "ייעוץ אנדודונטי" },
+  core: { label: "מבנה" },
+  "fiber-core": { label: "מבנה עם פוסט סיבי" },
+  "temporary-crown": { label: "כתר זמני" },
+  "zirconia-crown": { label: "כתר זירקוניה" },
+  "permanent-crown": { label: "כתר קבוע" },
+  "crown-recement": { label: "הדבקת כתר מחדש" },
+  "crown-removal": { label: "הסרת כתר" },
+  bridge: { label: "גשר" },
+  "bridge-replacement": { label: "החלפת גשר" },
+  "implant-crown": { label: "כתר נתמך שתל" },
+  "implant-bridge": { label: "גשר נתמך שתלים" },
+  flipper: { label: "פליפר זמני" },
+  "partial-denture": { label: "תותבת חלקית נשלפת" },
+  "complete-denture": { label: "תותבת שלמה נשלפת" },
+  "immediate-denture": { label: "תותבת מיידית" },
+  "reinforced-denture": { label: "תותבת עם רשת חיזוק מתכתית" },
+  overdenture: { label: "תותבת על נתמכת שתלים" },
+  relining: { label: "ריפוד תותבת" },
+  "denture-adjustment": { label: "התאמת תותבת" },
+  "denture-remake": { label: "הכנת תותבת מחדש" },
+  extraction: { label: "עקירה אצל רופא אחר" },
+  "surgical-extraction": { label: "עקירה כירורגית אצל רופא אחר" },
+  "implant-placement": { label: "השתלת שתל אצל רופא מתאים" },
+  "bone-augmentation": { label: "אוגמנטציית עצם" },
+  "sinus-lift": { label: "הרמת סינוס" },
+  "periodontal-consult": { label: "ייעוץ פריודונטלי" },
+  "implant-consult": { label: "ייעוץ בנושא השתלה" },
+  hygienist: { label: "טיפול שיננית" },
+};
+
+export const IMAGING_LABELS: Record<string, string> = {
+  status: "סטטוס רנטגני",
+  panoramic: "צילום פנורמי",
+  periapical: "צילום פריאפיקלי",
+  bitewing: "צילום נשך",
+  cbct: "CT / CBCT",
+};
+
+export const IMAGING_STATUS: Record<ImagingStatus, string> = {
+  recommended: "הומלץ",
+  performed: "בוצע, טרם תועד פענוח",
+  reviewed: "נבדק",
+  refused: "הוצע והמטופל סירב",
+};
+
+export const TREATMENT_STATUS: Record<ProcedureStatus, string> = {
+  recommended: "הומלץ",
+  planned: "מתוכנן",
+  completed: "בוצע",
+  cancelled: "בוטל",
+  refused: "הוצע והמטופל סירב",
+};
+
+export const SYMPTOM_HEBREW: Record<string, string> = {
+  "Холод": "רגישות לקור",
+  "Тепло": "רגישות לחום",
+  "Самопроизвольная боль": "כאב ספונטני",
+  "Боль при жевании": "כאב בלעיסה",
+  "Чувствительность к перкуссии": "רגישות בניקוש",
+  "Чувствительность к пальпации": "רגישות במישוש",
+  "Постоянная боль": "כאב מתמשך",
+  "Отек": "נפיחות לפי דיווח המטופל",
+  "Свищ": "פיסטולה לפי דיווח המטופל",
+  "Подвижность": "תחושת ניידות לפי דיווח המטופל",
+  "Жалоб нет": "ללא תלונות",
+};
+
+export const phrase = (catalog: Record<string, HebrewPhrase>, key: string) => catalog[key]?.label ?? key;
+
+export function hebrewList(items: string[]): string {
+  const unique = [...new Set(items.filter(Boolean))];
+  if (unique.length < 2) return unique[0] ?? "";
+  return `${unique.slice(0, -1).join(", ")} ו${unique.at(-1)}`;
+}

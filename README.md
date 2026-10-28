@@ -33,7 +33,16 @@ npm run test:e2e
 - `src/components`: responsive single-workspace UI.
 - `src/test`: scheduler/validation unit tests and critical Playwright flow.
 
-The domain layer has no React or network dependency, allowing an optional server-side language-polishing adapter later without changing clinical state or appointment calculations.
+The domain layer has no React, server, AI, or network dependency. `hebrew-catalog.ts` contains reusable clinical phrases, while `hebrew-templates.ts` handles deterministic grammar and section composition. Appointment calculation remains a separate module and is combined with the clinical record only at the UI export boundary.
+
+## Deterministic-only architecture
+
+- No OpenAI or other model integration, API keys, API routes, or server-side clinical-text processing.
+- Hebrew documentation is generated synchronously in the browser from selected structured data.
+- Findings, performed treatment, proposed treatment, imaging state, and patient decisions use separate templates.
+- Unreviewed imaging never produces a confirmed radiological finding.
+- The generated clinical record updates immediately until the clinician enters explicit manual-edit mode.
+- Copy and export append the independently calculated appointment-duration list.
 
 ## Safety and privacy
 

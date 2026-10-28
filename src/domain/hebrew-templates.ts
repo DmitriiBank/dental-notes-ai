@@ -1,57 +1,106 @@
-import type { ClinicalDraft } from "./types";
-import { appointmentLines, scheduleAppointments } from "./appointment-rules";
+import type { Alternative, ClinicalDraft, Imaging, ToothState, Treatment } from "./types";
+import {
+  HEBREW_FINDINGS,
+  HEBREW_TREATMENTS,
+  IMAGING_LABELS,
+  IMAGING_STATUS,
+  SYMPTOM_HEBREW,
+  TREATMENT_STATUS,
+  hebrewList,
+  phrase,
+} from "./hebrew-catalog";
 
-const HEB_FINDING: Record<string,string> = {
-  "primary-caries":"עששת", "secondary-caries":"עששת משנית", "deep-caries":"עששת עמוקה", "root-caries":"עששת שורש",
-  "crown-destruction":"הרס חלקי של הכותרת האנטומית", "residual-root":"שורש נותר", "fracture":"שבר בשן", "crack":"סדק בשן",
-  "wear":"שחיקת שיניים", "filling":"סתימה קיימת", "defective-filling":"סתימה לקויה", "artificial-crown":"כתר מלאכותי קיים",
-  "defective-crown":"כתר מלאכותי לקוי", "loose-crown":"כתר רופף", "crown-with-root":"הכתר נע יחד עם רקמת השורש",
-  "mobility":"ניידות", "recession":"נסיגת חניכיים", "pocket":"כיס פריודונטלי", "inflammation":"דלקת חניכיים",
-  "bleeding":"דימום", "bone-loss":"אובדן עצם", "treated-canals":"טיפול שורש קודם", "incomplete-rct":"מילוי תעלות חסר",
-  "periapical":"הצללה רדיולוצנטית פריאפיקלית", "fistula":"פיסטולה", "swelling":"נפיחות", "impacted":"שן כלואה",
-  "partially-impacted":"שן כלואה חלקית", "dystopic":"שן דיסטופית"
-};
-const HEB_TREATMENT: Record<string,string> = {
-  filling:"שחזור", "filling-replacement":"החלפת שחזור", "temporary-filling":"שחזור זמני", observation:"מעקב",
-  rct:"טיפול שורש", retreatment:"חידוש טיפול שורש", "endo-consult":"ייעוץ אנדודונטי", core:"מבנה", "fiber-core":"מבנה עם פוסט סיבי",
-  "temporary-crown":"כתר זמני", "zirconia-crown":"כתר זירקוניה", "crown-recement":"הדבקת כתר מחדש", extraction:"עקירה אצל רופא אחר",
-  "surgical-extraction":"עקירה כירורגית", "implant-consult":"ייעוץ להשתלה", "implant-placement":"השתלת שתל", hygienist:"טיפול שיננית",
-  "complete-denture":"תותבת שלמה נשלפת", "partial-denture":"תותבת חלקית נשלפת", "immediate-denture":"תותבת מיידית", "denture-adjustment":"התאמת תותבת"
-};
-const STATUS: Record<string,string> = { recommended:"מומלץ", planned:"מתוכנן", completed:"בוצע", cancelled:"בוטל", refused:"נדחה על ידי המטופל" };
-const IMAGE: Record<string,string> = { status:"סטטוס", panoramic:"צילום פנורמי", periapical:"צילום פריאפיקלי", bitewing:"צילום נשך", cbct:"CT / CBCT" };
+const unique = <T,>(items: T[]) => [...new Set(items)];
+const sentence = (value: string) => `${value.trim().replace(/[.;]+$/u, "")}.`;
+const cleanOutput = (value: string) => value.replace(/[“”]/gu, '"').replace(/[ \t]+\n/gu, "\n").trim();
 
-export function generateHebrewRecord(d: ClinicalDraft): string {
+function toothFindingSentence(tooth: ToothState): string | null {
+  if (tooth.missing) return null;
+  const findings = unique(tooth.findings).map(key => phrase(HEBREW_FINDINGS, key));
+  const symptoms = unique(tooth.symptoms).map(key => SYMPTOM_HEBREW[key] ?? key);
+  if (!findings.length && !symptoms.length && !tooth.notes) return null;
+
+  const parts: string[] = [];
+  if (findings.length) parts.push(hebrewList(findings));
+  if (tooth.surfaces.length && tooth.findings.some(key => key.includes("caries"))) {
+    parts.push(`במשטחים ${unique(tooth.surfaces).join(",")}`);
+  }
+  if (symptoms.length) parts.push(`לפי דיווח המטופל: ${hebrewList(symptoms)}`);
+  if (tooth.notes) parts.push(tooth.notes);
+
+  let result = `שן ${tooth.number}: ${parts.join("; ")}`;
+  if (tooth.findings.includes("deep-caries")) {
+    result += "; ייתכן צורך בטיפול שורש בהתאם למצב המוך ולממצאים במהלך הטיפול, ללא אבחנה אנדודונטית סופית בשלב זה";
+  }
+  return sentence(result);
+}
+
+function imagingSentence(imaging: Imaging): string {
+  const label = IMAGING_LABELS[imaging.kind] ?? imaging.kind;
+  const target = imaging.target ? ` עבור ${imaging.target}` : "";
+  if (imaging.status !== "reviewed") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}`);
+  const findingText = unique(imaging.findings).map(key => phrase(HEBREW_FINDINGS, key));
+  const details = [hebrewList(findingText), imaging.notes].filter(Boolean).join("; ");
+  return sentence(`${label}${target} נבדק${details ? `: ${details}` : ""}`);
+}
+
+function treatmentText(treatment: Treatment): string {
+  const target = treatment.tooth ? `בשן ${treatment.tooth} ` : "";
+  const details = [treatment.material ? `חומר ${treatment.material}` : "", treatment.shade ? `גוון ${treatment.shade}` : ""].filter(Boolean);
+  return `${target}${phrase(HEBREW_TREATMENTS, treatment.kind)}${details.length ? `, ${details.join(", ")}` : ""}`;
+}
+
+function alternativeText(alternative: Alternative): string | null {
+  if (!alternative.offered || !alternative.label.trim()) return null;
+  const target = alternative.tooth ? `לשן ${alternative.tooth} ` : "";
+  const clauses = [`${target}הוצגה האפשרות: ${alternative.label.trim()}`];
+  if (!alternative.feasible) clauses.push("האפשרות אינה נחשבת ישימה קלינית בשלב זה");
+  if (alternative.risksExplained) clauses.push("הסיכונים הוסברו");
+  if (alternative.prognosisDiscussed) clauses.push("הפרוגנוזה נדונה");
+  if (alternative.decision === "selected") clauses.push("המטופל בחר באפשרות זו");
+  if (alternative.decision === "refused") clauses.push("המטופל דחה אפשרות זו");
+  if (alternative.decision === "pending") clauses.push("החלטת המטופל ממתינה");
+  return clauses.join(", ");
+}
+
+/** Pure deterministic clinical-text generator with no scheduling or I/O. */
+export function generateHebrewRecord(draft: ClinicalDraft): string {
   const sections: string[] = [];
-  if (d.examination.complaint) sections.push(`סיבת הביקור:\n${d.examination.complaint}`);
-  if (d.examination.extraoral) sections.push(`EO: ${d.examination.extraoral}`);
-  if (d.examination.softTissues) sections.push(`רקמות רכות: ${d.examination.softTissues}`);
-  if (d.examination.occlusion) sections.push(`סגר: ${d.examination.occlusion}`);
-  if (d.examination.hygiene) sections.push(`OH: ${d.examination.hygiene}`);
-  if (d.examination.periodontal) sections.push(`פמ"ר: ${d.examination.periodontal}`);
-  if (d.examination.medicalFlags.length) sections.push(`אנמנזה רפואית:\n${d.examination.medicalFlags.join("; ")}.`);
-  if (d.edentulous.includes("upper")) sections.push("חוסר שיניים מלא בלסת העליונה.");
-  if (d.edentulous.includes("lower")) sections.push("חוסר שיניים מלא בלסת התחתונה.");
+  const examination = draft.examination;
 
-  const findings = Object.values(d.teeth).filter(t => t.findings.length && !t.missing).map(t => {
-    const surfaces = t.surfaces.length ? ` משטחים ${t.surfaces.join(",")}` : "";
-    const deep = t.findings.includes("deep-caries") ? " ייתכן צורך בטיפול שורש בהתאם למצב המוך ולממצאים במהלך הטיפול; אין בכך אבחנה סופית." : "";
-    return `שן ${t.number}: ${t.findings.map(x => HEB_FINDING[x] ?? x).join(", ")}${surfaces}.${deep}`;
+  if (examination.complaint.trim()) sections.push(`סיבת הביקור:\n${sentence(examination.complaint)}`);
+  if (examination.extraoral.trim()) sections.push(`EO: ${sentence(examination.extraoral)}`);
+  if (examination.softTissues.trim()) sections.push(`רקמות רכות: ${sentence(examination.softTissues)}`);
+  if (examination.occlusion.trim()) sections.push(`סגר: ${sentence(examination.occlusion)}`);
+  if (examination.hygiene.trim()) sections.push(`OH: ${sentence(examination.hygiene)}`);
+  if (examination.periodontal.trim()) sections.push(`פמ"ר: ${sentence(examination.periodontal)}`);
+  if (examination.medicalFlags.length) sections.push(`אנמנזה רפואית:\n${sentence(hebrewList(unique(examination.medicalFlags)))}`);
+
+  const clinicalFindings: string[] = [];
+  if (draft.edentulous.includes("upper")) clinicalFindings.push("חוסר שיניים מלא בלסת העליונה.");
+  if (draft.edentulous.includes("lower")) clinicalFindings.push("חוסר שיניים מלא בלסת התחתונה.");
+  Object.values(draft.teeth).map(toothFindingSentence).filter((value): value is string => Boolean(value)).forEach(value => clinicalFindings.push(value));
+  const missing = Object.values(draft.teeth).filter(tooth => tooth.missing).map(tooth => String(tooth.number));
+  if (missing.length && !draft.edentulous.length) clinicalFindings.push(sentence(`שיניים ${hebrewList(missing)} חסרות`));
+  examination.details.forEach(detail => clinicalFindings.push(sentence(detail)));
+  draft.implants.forEach(implant => {
+    const implantFindings = unique(implant.findings).map(key => phrase(HEBREW_FINDINGS, key));
+    clinicalFindings.push(sentence(`שתל באזור ${implant.region}${implantFindings.length ? `: ${hebrewList(implantFindings)}` : " קיים"}`));
   });
-  Object.values(d.teeth).filter(t => t.missing).forEach(t => findings.push(`שן ${t.number} חסרה.`));
-  d.implants.forEach(i => findings.push(`שתל באזור ${i.region}: ${i.findings.join(", ") || "שתל קיים"}.`));
-  if (findings.length) sections.push(`ממצאים קליניים:\n${findings.join(" ")}`);
+  if (clinicalFindings.length) sections.push(`ממצאים קליניים:\n${clinicalFindings.join(" ")}`);
 
-  const imaging = d.imaging.map(x => `${IMAGE[x.kind] ?? x.kind} (${x.status})${x.target ? `, ${x.target}` : ""}${x.findings.length ? `: ${x.findings.map(f => HEB_FINDING[f] ?? f).join(", ")}` : ""}.`);
-  if (imaging.length) sections.push(`ממצאים רדיולוגיים:\n${imaging.join(" ")}`);
+  if (draft.imaging.length) sections.push(`ממצאים רדיולוגיים:\n${draft.imaging.map(imagingSentence).join(" ")}`);
 
-  const allTreatments = [...Object.values(d.teeth).flatMap(t => t.treatments), ...d.generalTreatments];
-  const completed = allTreatments.filter(t => t.status === "completed").map(t => `${t.tooth ? `שן ${t.tooth}: ` : ""}${HEB_TREATMENT[t.kind] ?? t.kind}${t.material ? `, חומר ${t.material}` : ""}${t.shade ? `, גוון ${t.shade}` : ""}`);
-  if (completed.length) sections.push(`טיפול שבוצע:\n${completed.join("; ")}.`);
-  const planned = allTreatments.filter(t => t.status !== "completed" && t.status !== "cancelled").map(t => `${t.tooth ? `בשן ${t.tooth} ` : ""}${STATUS[t.status]} ${HEB_TREATMENT[t.kind] ?? t.kind}`);
-  d.alternatives.forEach(a => planned.push(`${a.tooth ? `בשן ${a.tooth} ` : ""}הוצגה חלופה: ${a.label}; החלטת המטופל: ${a.decision === "selected" ? "נבחרה" : a.decision === "refused" ? "נדחתה" : "ממתינה"}${a.risksExplained ? ", הסיכונים הוסברו" : ""}${a.prognosisDiscussed ? ", הפרוגנוזה נדונה" : ""}`));
-  if (planned.length) sections.push(`תוכנית טיפול והמלצות:\n${planned.join("; ")}.`);
-  const lines = appointmentLines(scheduleAppointments(d));
-  if (lines) sections.push(lines);
-  return sections.join("\n\n").replace(/[“”]/g, '"');
+  const allTreatments = [...Object.values(draft.teeth).flatMap(tooth => tooth.treatments), ...draft.generalTreatments];
+  const completed = allTreatments.filter(treatment => treatment.status === "completed");
+  if (completed.length) sections.push(`טיפול שבוצע:\n${sentence(hebrewList(unique(completed.map(treatmentText))))}`);
+
+  const plan: string[] = [];
+  allTreatments.filter(treatment => treatment.status !== "completed" && treatment.status !== "cancelled").forEach(treatment => {
+    plan.push(`${TREATMENT_STATUS[treatment.status]} ${treatmentText(treatment)}`);
+  });
+  draft.alternatives.map(alternativeText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
+  if (plan.length) sections.push(`תוכנית טיפול והמלצות:\n${sentence(unique(plan).join("; "))}`);
+
+  return cleanOutput(sections.join("\n\n"));
 }

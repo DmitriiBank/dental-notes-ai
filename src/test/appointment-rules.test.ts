@@ -11,5 +11,7 @@ describe("appointment scheduling",()=>{
   it("does not reschedule completed crown fixation",()=>expect(scheduleAppointments(caseF())).toHaveLength(0));
   it("does not schedule unsupported work for implant denture pain or pregnancy",()=>{expect(scheduleAppointments(caseE())).toHaveLength(0);expect(scheduleAppointments(caseG())).toHaveLength(0)});
   it("requires manual duration for two non-adjacent fillings",()=>{const d=emptyDraft();[11,13].forEach(n=>d.teeth[n].treatments.push({id:String(n),kind:"filling",status:"planned",tooth:n}));expect(scheduleAppointments(d)[0].duration).toBeNull()});
+  it("requires confirmation instead of inventing an unapproved prosthetic duration",()=>{const d=emptyDraft();d.teeth[12].treatments.push({id:"crown",kind:"zirconia-crown",status:"planned",tooth:12});expect(scheduleAppointments(d)).toEqual([{id:"unconfigured-crown",duration:null,source:"zirconia-crown",editable:true}])});
+  it("never places an externally provided procedure in the dentist schedule",()=>{const d=emptyDraft();d.generalTreatments.push({id:"external-adjustment",kind:"denture-adjustment",status:"recommended",provider:"external"});expect(scheduleAppointments(d)).toHaveLength(0)});
   it("appointment output contains only numbered durations",()=>expect(appointmentLines(scheduleAppointments(caseD()))).toBe("תור 1: 30 דקות\nתור 2: 30 דקות\nתור 3: 60 דקות\nתור 4: 30 דקות\nתור 5: 30 דקות"));
 });

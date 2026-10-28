@@ -10,3 +10,17 @@ test("chart, multi-select, sample case and Hebrew preview work",async({page})=>{
   await page.getByRole("combobox").first().selectOption("b");
   await expect(page.getByLabel("Предпросмотр записи на иврите")).toHaveValue(/עששת עמוקה/);
 });
+
+test("clinician can edit the final record and return to live generation", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("main")).toHaveAttribute("data-hydrated", "true");
+  const record = page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveAttribute("readonly", "");
+  await page.getByTitle("Редактировать итог").click();
+  await expect(record).not.toHaveAttribute("readonly", "");
+  await record.fill("טקסט ידני שנבדק על ידי הרופא.");
+  await expect(record).toHaveValue("טקסט ידני שנבדק על ידי הרופא.");
+  await page.getByTitle("Вернуться к автогенерации").click();
+  await expect(record).toHaveAttribute("readonly", "");
+  await expect(record).toHaveValue("");
+});

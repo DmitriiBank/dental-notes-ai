@@ -30,6 +30,7 @@ export interface Treatment {
   stage?: number;
   material?: string;
   shade?: string;
+  provider?: "self" | "external";
 }
 
 export interface Alternative {
