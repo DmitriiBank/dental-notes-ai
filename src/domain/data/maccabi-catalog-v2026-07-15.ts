@@ -57,6 +57,7 @@ export const MACCABI_CATALOG = {
   immediateCorePin:{shortCode:"סמ",catalogNumber:"15070",descriptionHe:"מבנה מיידי כולל פין אחד",eligibility:"requires-context"},
   castCore:{shortCode:"מי",catalogNumber:"13255",descriptionHe:"מבנה יצוק ממתכת",eligibility:"requires-context"},
   crownRecement:{shortCode:"ערהכ",catalogNumber:"10041",descriptionHe:"עזרה ראשונה הדבקת כתר (לכל יחידה מאחזת עד 3 יחידות)",eligibility:"requires-context"},
+  studyModels:{shortCode:"תל",catalogNumber:"13270",descriptionHe:"תבניות לימוד/עבודה לכל לסת",eligibility:"requires-context"},
   nightGuard:{shortCode:"סד",catalogNumber:"13410",descriptionHe:"סד לילה",eligibility:"base"},
   emergencyTreatment:{shortCode:"ער",catalogNumber:"13560",descriptionHe:"עזרה ראשונה / טיפול ללא קוד נפרד עד 20 דקות",eligibility:"requires-context"},
   emergencyExam:{shortCode:"ערא",catalogNumber:"13555",descriptionHe:"עזרה ראשונה: אבחון ומתן מרשם",eligibility:"requires-context"},
