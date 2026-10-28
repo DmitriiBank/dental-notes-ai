@@ -146,3 +146,17 @@ test("reviewed imaging can document normal periapical tissues without contradict
   await expect(record).not.toHaveValue(/לא הודגמו שינויים ברקמות הפריאפיקליות/u);
   await expect(record).toHaveValue(/הצללה רדיולוצנטית פריאפיקלית/u);
 });
+
+test("medication safety flags are rendered in Hebrew without internal English keys",async({page})=>{
+  await page.goto("/");await expect(page.locator("main")).toHaveAttribute("data-hydrated","true");
+  await page.getByRole("button",{name:"Лекарства",exact:true}).click();
+  await page.getByRole("button",{name:"Добавить проверку безопасности",exact:true}).click();
+  await page.getByLabel("Известность лекарственного анамнеза").selectOption("unknown");
+  await page.getByText("Остеопороз",{exact:true}).click();
+  await page.getByText("Требуется клиническая проверка",{exact:true}).click();
+  const record=page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveValue(/היסטוריית הטיפול התרופתי אינה ידועה/u);
+  await expect(record).toHaveValue(/גורמי סיכון מתועדים: אוסטאופורוזיס/u);
+  await expect(record).toHaveValue(/נדרשת בדיקה קלינית/u);
+  await expect(record).not.toHaveValue(/osteoporosis|clinical review/u);
+});
