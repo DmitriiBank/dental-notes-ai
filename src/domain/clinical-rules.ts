@@ -11,7 +11,9 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
   Object.values(d.teeth).forEach(t => {
     if (t.missing && (t.findings.length || t.treatments.some(x => !["implant-consult"].includes(x.kind)))) add(`missing-${t.number}`, "blocking", `Зуб ${t.number}: отсутствующий естественный зуб содержит несовместимые данные.`);
     if (t.findings.some(f => f.includes("caries")) && !t.surfaces.length) add(`surface-${t.number}`, "review", `Зуб ${t.number}: для кариеса не выбраны поверхности.`);
-    if(t.findings.includes("intact")&&t.findings.some(f=>f!=="intact"))add(`intact-conflict-${t.number}`,"blocking",`Зуб ${t.number}: клиническая норма несовместима с выбранной патологической находкой.`);
+    if(t.findings.includes("intact")&&t.findings.some(f=>!["intact","no-mobility","no-pockets"].includes(f)))add(`intact-conflict-${t.number}`,"blocking",`Зуб ${t.number}: клиническая норма несовместима с выбранной патологической находкой.`);
+    if(t.findings.includes("mobility")&&t.findings.includes("no-mobility"))add(`mobility-conflict-${t.number}`,"blocking",`Зуб ${t.number}: нельзя одновременно указать подвижность и её отсутствие.`);
+    if(t.findings.includes("pocket")&&t.findings.includes("no-pockets"))add(`pockets-conflict-${t.number}`,"blocking",`Зуб ${t.number}: нельзя одновременно указать пародонтальный карман и отсутствие патологических карманов.`);
     const crown = t.treatments.find(x => x.kind.includes("crown") && ["planned", "recommended"].includes(x.status));
     const rct = t.treatments.find(x => ["rct", "retreatment"].includes(x.kind) && x.status !== "completed");
     if (crown && rct) add(`sequence-${t.number}`, "blocking", `Зуб ${t.number}: до коронки требуется завершить эндодонтический этап и повторно оценить восстановимость.`);
