@@ -11,6 +11,7 @@ describe("simplified prosthodontic lab letters and alternatives",()=>{
     expect(text).toContain("אפשרות טיפול שנייה");
     expect(text).toContain("המטופל בחר באפשרות הטיפול השנייה");
   });
+  it("renders independent structured alternative treatment and choice below both plans",()=>{const draft=emptyDraft();draft.teeth[15].treatments=[{id:"a",kind:"zirconia-crown",status:"planned",tooth:15}];draft.alternativeTreatments=[{id:"b",kind:"extraction",status:"planned",tooth:15},{id:"c",kind:"implant-placement",status:"planned",tooth:15}];draft.treatmentOptions={first:"",second:"",decision:"second",confirmed:true};const text=generateHebrewRecord(draft);expect(text).toContain("תוכנית טיפול 1:");expect(text).toContain("תוכנית טיפול 2:");expect(text.indexOf("תוכנית טיפול 2:")).toBeLessThan(text.indexOf("המטופל בחר באפשרות הטיפול השנייה"));});
   it("never asserts a choice without clinician confirmation",()=>{
     const draft=emptyDraft();
     draft.treatmentOptions={first:"כתר בשן 15",second:"עקירה ושתל בשן 15",decision:"second",confirmed:false};
