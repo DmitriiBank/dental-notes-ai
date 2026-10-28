@@ -125,8 +125,8 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   aggregateClinicalFindings(draft).forEach(group=>clinicalFindings.push(group.text));
   clinicalFindings.push(...toothSpecificClinicalDetails(draft));
   (draft.regionalClinicalFindings??[]).filter(item=>item.clinicianConfirmed).forEach(item=>clinicalFindings.push(sentence(`${item.region==="lower-left"?"באזור הרטרומולרי השמאלי התחתון":item.region==="lower-right"?"באזור הרטרומולרי הימני התחתון":item.region==="upper-left"?"באזור הרטרומולרי השמאלי העליון":"באזור הרטרומולרי הימני העליון"}: ${item.id==="retromolar-tender-fold"?"קפל רירית רגיש במישוש":"לא נצפו סימני דלקת"}`)));
-  const missing = Object.values(draft.teeth).filter(tooth => tooth.missing).map(tooth => String(tooth.number));
-  if (missing.length && !draft.edentulous.length) clinicalFindings.push(sentence(`שיניים ${hebrewList(missing)} חסרות`));
+  const missing = Object.values(draft.teeth).filter(tooth => tooth.missing && !draft.edentulous.includes(tooth.number<30?"upper":"lower")).map(tooth => String(tooth.number));
+  if (missing.length) clinicalFindings.push(sentence(`שיניים ${hebrewList(missing)} חסרות`));
   const recommendedDetails=examination.details.filter(detail=>/^הומלץ/u.test(detail.trim()));
   examination.details.filter(detail=>!recommendedDetails.includes(detail)).forEach(detail => clinicalFindings.push(sentence(detail)));
   draft.implants.forEach(implant => {
