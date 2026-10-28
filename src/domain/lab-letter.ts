@@ -8,6 +8,7 @@ export function generateLabLetter(draft:ClinicalDraft,teeth:number[],additionalI
   const eligible=(draft.performedActs??[]).filter(a=>a.category==="fixed"&&a.status==="completed"&&a.clinicianConfirmed&&relevant.has(a.kind)&&(teeth.length===0||teethFor(a).some(t=>teeth.includes(t))));
   const positions=unique(eligible.flatMap(teethFor));
   const selected=teeth.length?teeth:positions;
+  if(!eligible.length)return "";
   const lines:string[]=[];
   if(selected.length)lines.push(`שיניים: ${selected.join(", ")}.`);
   const steps=unique(eligible.map(a=>labels[a.kind]).filter(Boolean));
@@ -15,8 +16,9 @@ export function generateLabLetter(draft:ClinicalDraft,teeth:number[],additionalI
   const shades=unique(eligible.flatMap(a=>"shade" in a&&a.shade?[a.shade]:[]));
   if(shades.length===1)lines.push(`גוון: ${shades[0]}.`);
   if(shades.length>1)lines.push("יש לוודא גוון לכל שן בנפרד.");
-  const materials=unique(eligible.flatMap(a=>a.material?[a.material]:[]));
-  if(materials.length===1)lines.push(`חומר שתועד בטיפול: ${materials[0]}.`);
+  // Core materials are not automatically described as crown materials.
+  const materials=unique(eligible.filter(a=>a.kind!=="crown-preparation"&&a.kind!=="crown-impression").flatMap(a=>a.material?[a.material]:[]));
+  if(materials.length===1)lines.push(`חומר שתועד בשלב הטיפול: ${materials[0]}.`);
   if(additionalInstructions.trim())lines.push(additionalInstructions.trim());
   return lines.join("\n");
 }
