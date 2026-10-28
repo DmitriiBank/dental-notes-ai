@@ -24,3 +24,18 @@ test("clinician can edit the final record and return to live generation", async 
   await expect(record).toHaveAttribute("readonly", "");
   await expect(record).toHaveValue("");
 });
+
+test("first-aid crown scenario uses the selected chart tooth and updates Hebrew live", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("main")).toHaveAttribute("data-hydrated", "true");
+  await page.getByRole("button", { name:"12", exact:true }).click();
+  await page.getByRole("button", { name:"Первая помощь", exact:true }).click();
+  await page.getByRole("button", { name:"Расфиксация коронки", exact:true }).click();
+  await page.getByRole("button", { name:"Искусственная коронка", exact:true }).click();
+  await page.getByRole("button", { name:/Коронка временно фиксирована Temp-Bond/u }).click();
+  await page.getByRole("button", { name:/Объяснено, что фиксация временная/u }).click();
+  const record = page.getByLabel("Предпросмотр записи на иврите");
+  await expect(record).toHaveValue(/השתחררות כתר בשן 12/u);
+  await expect(record).toHaveValue(/בוצעה הדבקה זמנית של הכתר בשן 12 באמצעות Temp-Bond/u);
+  await expect(record).toHaveValue(/הוסבר למטופל כי מדובר בהדבקה זמנית בלבד/u);
+});

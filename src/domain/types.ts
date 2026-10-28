@@ -74,6 +74,7 @@ export interface ClinicalDraft {
   generalTreatments: Treatment[];
   edentulous: Jaw[];
   customDurations: Record<string, number>;
+  firstAidSelections: FirstAidSelection[];
   updatedAt?: string;
 }
 
@@ -88,4 +89,18 @@ export interface ValidationIssue {
   id: string;
   severity: Severity;
   message: string;
+}
+
+export interface TemplateVariables {
+  tooth?: number;
+  surfaces?: Surface[];
+  region?: string;
+  shade?: string;
+  material?: string;
+}
+
+export interface FirstAidSelection {
+  phraseId: string;
+  vars: TemplateVariables;
+  confirmed: boolean;
 }

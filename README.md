@@ -29,6 +29,7 @@ npm run test:e2e
 ## Architecture
 
 - `src/domain`: typed dental model, FDI topology, deterministic scheduling, validation, Hebrew templates, fictional cases.
+- `src/domain/first-aid-catalog.ts`: typed clinical phrases and twelve confirmation-based first-aid scenarios adapted from `dental-templates-v1`.
 - `src/store`: Zustand draft, selection, undo and browser-local demo persistence.
 - `src/components`: responsive single-workspace UI.
 - `src/test`: scheduler/validation unit tests and critical Playwright flow.
@@ -43,6 +44,10 @@ The domain layer has no React, server, AI, or network dependency. `hebrew-catalo
 - Unreviewed imaging never produces a confirmed radiological finding.
 - The generated clinical record updates immediately until the clinician enters explicit manual-edit mode.
 - Copy and export append the independently calculated appointment-duration list.
+
+## First aid workflows
+
+The **Первая помощь** tab uses the currently selected FDI tooth and its selected surfaces. A scenario only opens a checklist; it never inserts a diagnosis or performed treatment automatically. Complaint, finding, performed procedure, recommendation, and counseling phrases must each be selected explicitly. Region-dependent phrases also require a region value. Every accepted phrase updates the Hebrew preview immediately.
 
 ## Safety and privacy
 

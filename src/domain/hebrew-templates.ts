@@ -9,6 +9,7 @@ import {
   hebrewList,
   phrase,
 } from "./hebrew-catalog";
+import { groupFirstAidSelections } from "./first-aid-catalog";
 
 const unique = <T,>(items: T[]) => [...new Set(items)];
 const sentence = (value: string) => `${value.trim().replace(/[.;]+$/u, "")}.`;
@@ -67,8 +68,10 @@ function alternativeText(alternative: Alternative): string | null {
 export function generateHebrewRecord(draft: ClinicalDraft): string {
   const sections: string[] = [];
   const examination = draft.examination;
+  const firstAid = groupFirstAidSelections(draft.firstAidSelections ?? []);
 
-  if (examination.complaint.trim()) sections.push(`סיבת הביקור:\n${sentence(examination.complaint)}`);
+  const complaints = [examination.complaint.trim() ? sentence(examination.complaint) : "", ...(firstAid.get("complaint") ?? [])].filter(Boolean);
+  if (complaints.length) sections.push(`סיבת הביקור:\n${unique(complaints).join(" ")}`);
   if (examination.extraoral.trim()) sections.push(`EO: ${sentence(examination.extraoral)}`);
   if (examination.softTissues.trim()) sections.push(`רקמות רכות: ${sentence(examination.softTissues)}`);
   if (examination.occlusion.trim()) sections.push(`סגר: ${sentence(examination.occlusion)}`);
@@ -87,19 +90,23 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
     const implantFindings = unique(implant.findings).map(key => phrase(HEBREW_FINDINGS, key));
     clinicalFindings.push(sentence(`שתל באזור ${implant.region}${implantFindings.length ? `: ${hebrewList(implantFindings)}` : " קיים"}`));
   });
+  clinicalFindings.push(...(firstAid.get("clinical") ?? []));
   if (clinicalFindings.length) sections.push(`ממצאים קליניים:\n${clinicalFindings.join(" ")}`);
 
-  if (draft.imaging.length) sections.push(`ממצאים רדיולוגיים:\n${draft.imaging.map(imagingSentence).join(" ")}`);
+  const radiology = [...draft.imaging.map(imagingSentence), ...(firstAid.get("radiology") ?? [])];
+  if (radiology.length) sections.push(`ממצאים רדיולוגיים:\n${unique(radiology).join(" ")}`);
 
   const allTreatments = [...Object.values(draft.teeth).flatMap(tooth => tooth.treatments), ...draft.generalTreatments];
   const completed = allTreatments.filter(treatment => treatment.status === "completed");
-  if (completed.length) sections.push(`טיפול שבוצע:\n${sentence(hebrewList(unique(completed.map(treatmentText))))}`);
+  const completedText = [...completed.map(treatmentText).map(sentence), ...(firstAid.get("completed") ?? [])];
+  if (completedText.length) sections.push(`טיפול שבוצע:\n${unique(completedText).join(" ")}`);
 
   const plan: string[] = [];
   allTreatments.filter(treatment => treatment.status !== "completed" && treatment.status !== "cancelled").forEach(treatment => {
     plan.push(`${TREATMENT_STATUS[treatment.status]} ${treatmentText(treatment)}`);
   });
   draft.alternatives.map(alternativeText).filter((value): value is string => Boolean(value)).forEach(value => plan.push(value));
+  plan.push(...(firstAid.get("recommendation") ?? []), ...(firstAid.get("counseling") ?? []));
   if (plan.length) sections.push(`תוכנית טיפול והמלצות:\n${sentence(unique(plan).join("; "))}`);
 
   return cleanOutput(sections.join("\n\n"));
