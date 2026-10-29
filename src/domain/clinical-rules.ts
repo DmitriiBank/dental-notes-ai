@@ -10,6 +10,8 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
   validateStructuredEntities(d).forEach((message,index)=>add(`structured-schema-${index}`,"blocking",`Некорректная структурированная запись: ${message}`));
   Object.values(d.teeth).forEach(t => {
     if (t.missing && (t.findings.length || t.treatments.some(x => !["implant-consult"].includes(x.kind)))) add(`missing-${t.number}`, "blocking", `Зуб ${t.number}: отсутствующий естественный зуб содержит несовместимые данные.`);
+    for(const [key,value,max] of [["clinicalCrownHeightMm",t.clinicalCrownHeightMm,25],["recessionMm",t.recessionMm,20],...Object.entries(t.probingDepthsMm??{}).map(([site,value])=>[`probing-${site}`,value,15] as const)] as const){if(value!==undefined&&(!Number.isFinite(value)||value<0||value>max))add(`measurement-${key}-${t.number}`,"blocking",`Зуб ${t.number}: измерение ${key} вне допустимого диапазона.`)}
+    if(t.mobilityGrade!==undefined&&t.findings.includes("no-mobility"))add(`mobility-grade-conflict-${t.number}`,"blocking",`Зуб ${t.number}: измерена подвижность и одновременно указано её отсутствие.`);
     if (t.findings.some(f => f.includes("caries")) && !t.surfaces.length) add(`surface-${t.number}`, "review", `Зуб ${t.number}: для кариеса не выбраны поверхности.`);
     if(t.findings.includes("intact")&&t.findings.some(f=>!["intact","no-mobility","no-pockets","percussion-negative","palpation-negative","cold-normal"].includes(f)))add(`intact-conflict-${t.number}`,"blocking",`Зуб ${t.number}: клиническая норма несовместима с выбранной патологической находкой.`);
     if(t.findings.includes("mobility")&&t.findings.includes("no-mobility"))add(`mobility-conflict-${t.number}`,"blocking",`Зуб ${t.number}: нельзя одновременно указать подвижность и её отсутствие.`);
@@ -20,6 +22,7 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
     if (crown && rct) add(`sequence-${t.number}`, "blocking", `Зуб ${t.number}: до коронки требуется завершить эндодонтический этап и повторно оценить восстановимость.`);
     t.treatments.filter(treatment=>treatment.tooth!==undefined&&treatment.tooth!==t.number).forEach(treatment=>add(`tooth-mismatch-${t.number}-${treatment.id}`,"blocking",`Лечение сохранено у зуба ${t.number}, но внутри назначения указан зуб ${treatment.tooth}.`));
   });
+  for(const [key,value] of [["overbite",d.examination.overbiteMm],["overjet",d.examination.overjetMm]] as const){if(value!==undefined&&(!Number.isFinite(value)||value< -15||value>20))add(`occlusion-${key}-range`,"blocking",`Значение ${key} вне допустимого диапазона.`)}
   if((d.examination.occlusionFindings??[]).length&&/^(תקין\.?|normal)$/iu.test(d.examination.occlusion.trim()))add("occlusion-conflict","blocking","Нельзя одновременно указать нормальную окклюзию и патологические окклюзионные находки.");
   if (!d.examination.normalsConfirmed && [d.examination.extraoral, d.examination.softTissues, d.examination.occlusion, d.examination.periodontal].some(Boolean)) add("normals", "review", "Нормальные значения требуют подтверждения врача.");
   d.imaging.forEach(x => {
