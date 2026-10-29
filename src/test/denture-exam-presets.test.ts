@@ -29,6 +29,7 @@ describe("existing dentures and general exam presets",()=>{
   const d=emptyDraft();d.examination.extraoral="ממצא נוסף";d.examination.selectedExamPresets={extraoral:["muscle-tenderness"]};
   const text=generateHebrewRecord(d);expect(text).toContain("ממצא נוסף");expect(text).toContain("רגישות במישוש שרירי הלעיסה");
  });
+ it("preserves the distinction between recommendation and scheduled treatment",()=>{const d=emptyDraft();d.teeth[16].treatments=[{id:"r1",kind:"zirconia-crown",status:"recommended",tooth:16}];const record=generateHebrewRecord(d);expect(record).toContain("הומלץ");expect(record).not.toContain("מתוכנן");});
  it("prevents contradictory normal and abnormal descriptions",()=>{
   const d=emptyDraft();d.existingDentures=[{id:"d1",jaw:"upper",kind:"complete",findings:["serviceable","base-fracture"]}];
   d.examination.selectedExamPresets={softTissues:["normal","erosion"]};
