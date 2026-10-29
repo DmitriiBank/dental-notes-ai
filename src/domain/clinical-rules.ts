@@ -1,3 +1,4 @@
+import {EXAM_PRESETS,DENTURE_FINDINGS} from "./exam-presets";
 import type { ClinicalDraft, ValidationIssue } from "./types";
 import { scheduleAppointments } from "./appointment-rules";
 import { selectMaccabiCodeCandidates } from "./maccabi-codes";
@@ -8,6 +9,8 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
   const issues: ValidationIssue[] = [];
   const add = (id: string, severity: ValidationIssue["severity"], message: string) => issues.push({ id, severity, message });
   validateStructuredEntities(d).forEach((message,index)=>add(`structured-schema-${index}`,"blocking",`Некорректная структурированная запись: ${message}`));
+  for(const field of Object.keys(EXAM_PRESETS) as Array<keyof typeof EXAM_PRESETS>){const ids=d.examination.selectedExamPresets?.[field]??[];const known=EXAM_PRESETS[field] as readonly {id:string}[];for(const id of ids)if(!known.some(p=>p.id===id))add(`exam-preset-unknown-${field}-${id}`,"review",`Неизвестная находка осмотра: ${field} / ${id}.`);if(ids.includes("normal")&&ids.length>1)add(`exam-preset-conflict-${field}`,"blocking",`В разделе ${field} одновременно выбраны норма и патологические находки.`);if(field==="hygiene"&&ids.filter(id=>["good","fair","poor"].includes(id)).length>1)add("exam-hygiene-conflict","blocking","Выбраны разные общие оценки гигиены.");}
+  for(const item of d.existingDentures??[]){const ids=item.findings;const known=DENTURE_FINDINGS as readonly {id:string}[];for(const id of ids)if(!known.some(f=>f.id===id))add(`denture-unknown-${item.id}-${id}`,"review","Неизвестная находка съёмного протеза.");if(ids.includes("serviceable")&&ids.length>1)add(`denture-conflict-${item.id}`,"blocking","Существующий протез отмечен как состоятельный и одновременно имеет дефект.");if(!ids.length&&!item.notes?.trim())add(`denture-empty-${item.id}`,"review","Существующий протез: укажите результаты осмотра.");}
   Object.values(d.teeth).forEach(t => {
     if (t.missing && (t.findings.length || t.treatments.some(x => !["implant-consult"].includes(x.kind)))) add(`missing-${t.number}`, "blocking", `Зуб ${t.number}: отсутствующий естественный зуб содержит несовместимые данные.`);
     for(const [key,value,max] of [["clinicalCrownHeightMm",t.clinicalCrownHeightMm,25],["recessionMm",t.recessionMm,20],...Object.entries(t.probingDepthsMm??{}).map(([site,value])=>[`probing-${site}`,value,15] as const)] as const){if(value!==undefined&&(!Number.isFinite(value)||value<0||value>max))add(`measurement-${key}-${t.number}`,"blocking",`Зуб ${t.number}: измерение ${key} вне допустимого диапазона.`)}

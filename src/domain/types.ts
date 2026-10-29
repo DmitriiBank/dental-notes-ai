@@ -248,6 +248,7 @@ export interface Examination {
   softTissues: string;
   occlusion: string;
   occlusionFindings?: string[];
+  selectedExamPresets?: Partial<Record<"extraoral"|"softTissues"|"occlusion"|"hygiene"|"periodontal",string[]>>;
   overbiteMm?: number;
   overjetMm?: number;
   hygiene: string;
@@ -266,6 +267,7 @@ export interface ClinicalDraft {
   treatmentOptions?: {first:string;second:string;decision?:"no-treatment"|"first"|"second";confirmed:boolean};
   alternativeTreatments?: Treatment[];
   labLetters?: Array<{id:string;teeth:number[];text:string}>;
+  existingDentures?: Array<{id:string;jaw:Jaw;kind:"complete"|"partial"|"flipper"|"implant-supported";findings:string[];notes?:string}>;
   generalTreatments: Treatment[];
   edentulous: Jaw[];
   customDurations: Record<string, number>;
