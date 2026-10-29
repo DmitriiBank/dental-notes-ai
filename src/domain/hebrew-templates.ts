@@ -1,4 +1,5 @@
 import type { Alternative, ClinicalDraft, Imaging, Treatment } from "./types";
+import {ORAL_DEPOSITS} from "./oral-status";
 import {EXAM_PRESETS,DENTURE_FINDINGS} from "./exam-presets";
 import {
   HEBREW_FINDINGS,
@@ -127,6 +128,9 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   if (medicationLines.length) sections.push(`תיעוד תרופתי:\n${medicationLines.join(" ")}`);
 
   const clinicalFindings: string[] = [];
+  if(examination.oralCavityNormal)clinicalFindings.push("בבדיקת חלל הפה לא נמצאו ממצאים פתולוגיים.");
+  const deposits=ORAL_DEPOSITS.filter(item=>(examination.oralDeposits??[]).includes(item.id)).map(item=>item.he);
+  if(deposits.length)clinicalFindings.push(sentence(deposits.join("; ")));
   if (draft.edentulous.includes("upper")) clinicalFindings.push("חוסר שיניים מלא בלסת העליונה.");
   if (draft.edentulous.includes("lower")) clinicalFindings.push("חוסר שיניים מלא בלסת התחתונה.");
   aggregateClinicalFindings(draft).forEach(group=>clinicalFindings.push(group.text));

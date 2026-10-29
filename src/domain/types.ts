@@ -249,6 +249,8 @@ export interface Examination {
   occlusion: string;
   occlusionFindings?: string[];
   selectedExamPresets?: Partial<Record<"extraoral"|"softTissues"|"occlusion"|"hygiene"|"periodontal",string[]>>;
+  oralCavityNormal?: boolean;
+  oralDeposits?: string[];
   overbiteMm?: number;
   overjetMm?: number;
   hygiene: string;
