@@ -14,6 +14,12 @@ export interface ToothState {
   complaints?: ComplaintSelection[];
   treatments: Treatment[];
   notes?: string;
+  clinicalCrownHeightMm?: number;
+  probingDepthsMm?: Partial<Record<"MB"|"B"|"DB"|"ML"|"L"|"DL",number>>;
+  recessionMm?: number;
+  bleedingOnProbing?: boolean;
+  mobilityGrade?: 1|2|3;
+  furcationGrade?: 1|2|3;
 }
 
 export type ComplaintOnset = "today" | "days" | "weeks" | "months" | "longstanding";
@@ -241,6 +247,9 @@ export interface Examination {
   extraoral: string;
   softTissues: string;
   occlusion: string;
+  occlusionFindings?: string[];
+  overbiteMm?: number;
+  overjetMm?: number;
   hygiene: string;
   periodontal: string;
   details: string[];

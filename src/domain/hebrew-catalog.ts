@@ -6,6 +6,19 @@ export interface HebrewPhrase {
 }
 
 export const HEBREW_FINDINGS: Record<string, HebrewPhrase> = {
+  "percussion-positive": { label: "רגישות לניקוש" },
+  "percussion-negative": { label: "ניקוש ללא רגישות" },
+  "palpation-positive": { label: "רגישות במישוש" },
+  "palpation-negative": { label: "מישוש ללא רגישות" },
+  "cold-normal": { label: "תגובה קצרה תקינה לקור" },
+  "cold-negative": { label: "ללא תגובה לקור" },
+  "cold-prolonged": { label: "תגובה ממושכת לקור" },
+  "short-clinical-crown": { label: "כותרת קלינית קצרה" },
+  "insufficient-ferrule": { label: "Ferrule לא מספק" },
+  "insufficient-retention": { label: "רטנציה לא מספקת לכתר" },
+  "insufficient-tooth-structure": { label: "חומר שן כותרתי לא מספק" },
+  "insufficient-prosthetic-space": { label: "מרווח לא מספק לשיקום" },
+  "deep-subgingival-margin": { label: "גבול שיקומי עמוק מתחת לחניכיים" },
   "primary-caries": { label: "עששת ראשונית" },
   "secondary-caries": { label: "עששת משנית" },
   "deep-caries": { label: "עששת עמוקה" },
