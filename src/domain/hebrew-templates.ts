@@ -1,4 +1,4 @@
-import { EXTRACTION_SOCKET_FINDINGS } from "@/components/extraction-socket-editor";
+import { EXTRACTION_SOCKET_FINDINGS } from "./extraction-socket-catalog";
 import type { Alternative, ClinicalDraft, Imaging, Treatment } from "./types";
 import {ORAL_DEPOSITS} from "./oral-status";
 import {EXAM_PRESETS,DENTURE_FINDINGS} from "./exam-presets";
