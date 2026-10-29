@@ -768,6 +768,27 @@
       "labelRu": "Просит срочную помощь",
       "phraseHe": "בקשה לעזרה דחופה",
       "patientReported": true
+    },
+    {
+      "id": "post-extraction-check",
+      "category": "trauma_emergency",
+      "labelRu": "Контроль состояния после удаления зуба",
+      "phraseHe": "הגיע/ה לביקורת לאחר עקירת שן",
+      "patientReported": true
+    },
+    {
+      "id": "post-extraction-bad-odor",
+      "category": "trauma_emergency",
+      "labelRu": "Неприятный запах или вкус после удаления",
+      "phraseHe": "ריח או טעם לא נעימים לאחר עקירה",
+      "patientReported": true
+    },
+    {
+      "id": "post-extraction-socket-discomfort",
+      "category": "trauma_emergency",
+      "labelRu": "Дискомфорт в области лунки после удаления",
+      "phraseHe": "אי נוחות באזור מכתשית העקירה",
+      "patientReported": true
     }
   ],
   "modifiers": {
