@@ -14,6 +14,13 @@ describe("sinus imaging and orthodontic clinical findings",()=>{
   const note=generateHebrewRecord(d);
   expect(note).toContain("קיבוע שיניים קיים");expect(note).toContain("קשת אורתודונטית קיימת");expect(note).toContain("בקיעת יתר");
  });
+ it("records a discolored restoration without diagnosing secondary caries",()=>{
+  const d=emptyDraft();d.teeth[21].findings=["discolored-filling","marginal-staining"];
+  const text=generateHebrewRecord(d);
+  expect(text).toContain("שינוי צבע של שחזור קיים");
+  expect(text).toContain("צביעה בשולי השחזור");
+  expect(text).not.toContain("עששת משנית");
+ });
  it("does not confuse radiographic sinus opacity with periapical pathology",()=>{
   const d=emptyDraft();
   d.imaging=[{id:"sinus1",kind:"panoramic",status:"reviewed",findings:["sinus-floor-opacity","sinus-mucosal-thickening"]}];
