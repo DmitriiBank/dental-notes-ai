@@ -5,6 +5,16 @@ export interface ClinicalPhrase { id: string; ru: string; he: string; section: T
 export interface FirstAidPreset { id: string; ru: string; complaint: string[]; findings: string[]; performed: string[]; recommendations: string[]; checks: string[] }
 
 export const clinicalPhrases: ClinicalPhrase[] = [
+  { id:"complaint.post_extraction_pain", ru:"Боль в области лунки после удаления", he:"המטופל מתלונן על כאב באזור מכתשית העקירה {region}.", section:"complaint" },
+  { id:"complaint.bad_taste", ru:"Неприятный вкус / запах после удаления", he:"המטופל מדווח על טעם או ריח לא נעים לאחר העקירה באזור {region}.", section:"complaint" },
+  { id:"finding.empty_socket", ru:"В лунке отсутствует кровяной сгусток", he:"במכתשית העקירה באזור {region} לא נצפה קריש דם.", section:"clinical" },
+  { id:"finding.exposed_socket_bone", ru:"Обнажена костная поверхность лунки", he:"נצפתה עצם חשופה במכתשית העקירה באזור {region}.", section:"clinical" },
+  { id:"finding.socket_tenderness", ru:"Лунка болезненна при пальпации", he:"קיימת רגישות במישוש באזור מכתשית העקירה {region}.", section:"clinical" },
+  { id:"finding.alveolitis_confirmed", ru:"Альвеолит подтверждён врачом", he:"אובחנה דלקת מכתשית לאחר עקירה באזור {region}.", section:"clinical", requiresConfirmation:true },
+  { id:"done.socket_saline_irrigation", ru:"Осторожное промывание лунки стерильным физиологическим раствором", he:"בוצעה שטיפה עדינה של מכתשית העקירה באזור {region} בתמיסת סליין סטרילית.", section:"completed", requiresConfirmation:true },
+  { id:"done.socket_dressing", ru:"В лунку помещена лечебная повязка", he:"הונחה חבישה טיפולית במכתשית העקירה באזור {region}.", section:"completed", requiresConfirmation:true },
+  { id:"rec.alveolitis_review", ru:"Рекомендован повторный осмотр лунки", he:"הומלצה ביקורת של מכתשית העקירה בהתאם למהלך הקליני.", section:"recommendation" },
+  { id:"rec.analgesic_assessment", ru:"Рекомендовано обезболивание с учётом противопоказаний", he:"הומלץ על טיפול לשיכוך כאב בהתאם למצב הרפואי ולהתוויות הנגד.", section:"recommendation" },
   { id:"complaint.pain", ru:"Боль в области зуба", he:"המטופל מתלונן על כאב באזור שן {tooth}.", section:"complaint" },
   { id:"complaint.mobility", ru:"Подвижность зуба", he:"המטופל מתלונן על ניידות בשן {tooth}.", section:"complaint" },
   { id:"complaint.crown_off", ru:"Расфиксация коронки", he:"המטופל הגיע עקב השתחררות כתר בשן {tooth}.", section:"complaint" },
@@ -32,6 +42,7 @@ export const clinicalPhrases: ClinicalPhrase[] = [
 ];
 
 export const firstAidPresets: FirstAidPreset[] = [
+  {id:"er.alveolitis",ru:"Альвеолит после удаления",complaint:["complaint.post_extraction_pain","complaint.bad_taste"],findings:["finding.empty_socket","finding.exposed_socket_bone","finding.socket_tenderness","finding.alveolitis_confirmed"],performed:["done.socket_saline_irrigation","done.socket_dressing"],recommendations:["rec.alveolitis_review","rec.analgesic_assessment"],checks:["Уточнить дату удаления, участок и характер боли","Оценить кровяной сгусток, обнажение кости, отёк и выделения","Исключить признаки инфекции и другие причины боли","Подтвердить фактически выполненные обработку и повязку","Лекарства указать только если действительно рекомендованы или назначены"]},
   {id:"er.crown_decemented",ru:"Расфиксация коронки",complaint:["complaint.crown_off"],findings:["finding.artificial_crown"],performed:["done.tempbond_crown"],recommendations:["counsel.temporary_cement","rec.definitive_crown_assessment"],checks:["Номер зуба","Оценена посадка коронки?","Temp-Bond действительно использован?","Есть кариес, перелом или подвижность?"]},
   {id:"er.bridge_loose",ru:"Подвижность / расфиксация моста",complaint:["complaint.bridge_loose"],findings:[],performed:[],recommendations:["rec.definitive_crown_assessment"],checks:["Единицы моста и опоры","Что действительно выполнено?","Есть острые края?","Нужен снимок?"]},
   {id:"er.filling_broken",ru:"Скол пломбы / открытая полость",complaint:["complaint.filling_broken"],findings:[],performed:["done.temporary_filling"],recommendations:["rec.status","rec.definitive_crown_assessment"],checks:["Зуб и поверхности","Временная пломба действительно поставлена?","Есть подозрение на вовлечение пульпы?"]},
