@@ -1,17 +1,6 @@
 "use client";
 import {useExamStore} from "@/store/examination-store";
-export const EXTRACTION_SOCKET_FINDINGS=[
- {id:"healing-normal",ru:"Заживление лунки без особенностей",he:"ריפוי תקין של מכתשית העקירה"},
- {id:"clot-present",ru:"Кровяной сгусток сохранён",he:"קריש דם קיים במכתשית העקירה"},
- {id:"clot-absent",ru:"Кровяной сгусток отсутствует",he:"לא נצפה קריש דם במכתשית העקירה"},
- {id:"socket-tender",ru:"Болезненность лунки",he:"רגישות באזור מכתשית העקירה"},
- {id:"exposed-bone",ru:"Обнажённая кость в лунке",he:"עצם חשופה במכתשית העקירה"},
- {id:"fibrin",ru:"Фибринозный налёт в лунке",he:"רובד פיברין במכתשית העקירה"},
- {id:"granulation",ru:"Грануляционная ткань",he:"רקמת גרנולציה במכתשית העקירה"},
- {id:"swelling",ru:"Отёк тканей вокруг лунки",he:"נפיחות ברקמות סביב מכתשית העקירה"},
- {id:"suppuration",ru:"Гнойное отделяемое",he:"הפרשה מוגלתית ממכתשית העקירה"},
- {id:"alveolitis-confirmed",ru:"Альвеолит (диагноз подтверждён врачом)",he:"אובחנה דלקת מכתשית לאחר עקירה"}
-] as const;
+import {EXTRACTION_SOCKET_FINDINGS} from "@/domain/extraction-socket-catalog";
 export function ExtractionSocketEditor(){
  const s=useExamStore(),sites=s.draft.extractionSites??[];
  return <section className="mt-4 rounded-xl border p-3"><div className="text-sm font-bold">Состояние после удаления · осмотр лунки</div><p className="mt-1 text-xs text-slate-500">Отметьте только увиденные находки. «Заживление без особенностей» не выбирается автоматически.</p>
