@@ -65,13 +65,7 @@ export const FINDING_GROUPS = [
       "crack",
       "chip",
       "short-roots",
-      "poor-prognosis",
-      "short-clinical-crown",
-      "insufficient-ferrule",
-      "insufficient-retention",
-      "insufficient-tooth-structure",
-      "insufficient-prosthetic-space",
-      "deep-subgingival-margin"
+      "poor-prognosis"
     ]
   },
   {
@@ -89,6 +83,17 @@ export const FINDING_GROUPS = [
       "bridge-pontic",
       "post-core",
       "fiber-post"
+    ]
+  },
+  {
+    "label": "Ортопедическая оценка зуба",
+    "ids": [
+      "short-clinical-crown",
+      "insufficient-ferrule",
+      "insufficient-retention",
+      "insufficient-tooth-structure",
+      "insufficient-prosthetic-space",
+      "deep-subgingival-margin"
     ]
   },
   {
