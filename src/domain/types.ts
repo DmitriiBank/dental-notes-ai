@@ -269,6 +269,7 @@ export interface ClinicalDraft {
   treatmentOptions?: {first:string;second:string;decision?:"no-treatment"|"first"|"second";confirmed:boolean};
   alternativeTreatments?: Treatment[];
   labLetters?: Array<{id:string;teeth:number[];text:string}>;
+  extractionSites?: Array<{id:string;region:string;findings:string[]}>;
   existingDentures?: Array<{id:string;jaw:Jaw;kind:"complete"|"partial"|"flipper"|"implant-supported";findings:string[];notes?:string}>;
   generalTreatments: Treatment[];
   edentulous: Jaw[];
