@@ -54,6 +54,15 @@ export function toothSpecificClinicalDetails(draft:ClinicalDraft):string[]{
   const result:string[]=[];
   Object.values(draft.teeth).filter(tooth=>!tooth.missing).sort((a,b)=>a.number-b.number).forEach(tooth=>{
     unique(tooth.symptoms).forEach(symptom=>result.push(sentence(`שן ${tooth.number}, לפי דיווח המטופל: ${SYMPTOM_HEBREW[symptom]??symptom}`)));
+    const metrics:string[]=[];
+    if(tooth.clinicalCrownHeightMm!==undefined)metrics.push(`גובה כותרת קלינית ${tooth.clinicalCrownHeightMm} מ"מ`);
+    if(tooth.recessionMm!==undefined)metrics.push(`נסיגת חניכיים ${tooth.recessionMm} מ"מ`);
+    if(tooth.mobilityGrade!==undefined)metrics.push(`ניידות דרגה ${tooth.mobilityGrade}`);
+    if(tooth.furcationGrade!==undefined)metrics.push(`מעורבות פורקציה דרגה ${tooth.furcationGrade}`);
+    if(tooth.bleedingOnProbing!==undefined)metrics.push(tooth.bleedingOnProbing?"דימום בבדיקת כיסים":"ללא דימום בבדיקת כיסים");
+    const depths=Object.entries(tooth.probingDepthsMm??{}).filter(([,value])=>value!==undefined).map(([site,value])=>`${site}: ${value} מ"מ`);
+    if(depths.length)metrics.push(`עומקי כיסים: ${depths.join(", ")}`);
+    if(metrics.length)result.push(sentence(`שן ${tooth.number}: ${metrics.join("; ")}`));
     if(tooth.notes?.trim())result.push(sentence(`שן ${tooth.number}: ${tooth.notes.trim()}`));
 
   });
