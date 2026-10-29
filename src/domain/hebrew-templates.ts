@@ -160,6 +160,10 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   const completed = allTreatments.filter(treatment => treatment.status === "completed");
   const completedText = [...groupTreatments(completed).map(groupedTreatmentText).map(sentence), ...(firstAid.get("completed") ?? [])];
   completedText.push(...groupedPerformedTexts(draft.performedActs??[]));
+  (draft.performedActs??[]).filter(act=>act.status==="completed"&&act.clinicianConfirmed&&act.withoutWarranty).forEach(act=>{
+    const location=act.target.type==="tooth"&&act.target.teeth.length?`בשיניים ${hebrewList(act.target.teeth.map(String))}`:act.target.type==="jaw"?(act.target.jaw==="upper"?"בלסת העליונה":"בלסת התחתונה"):act.target.type==="construction"?"במסגרת השיקום":act.target.type==="region"?`באזור ${act.target.regionId}`:"";
+    completedText.push(sentence(`הטיפול ${location} בוצע ללא אחריות`));
+  });
   completedText.push(...(draft.clinicalDiscussions??[]).filter(item=>item.explicitlyExplained&&item.clinicianConfirmed).map(discussionText));
   (draft.labOrders ?? []).flatMap(order => order.stages).map(completedLabStageText).filter((value): value is string => Boolean(value)).forEach(value => completedText.push(value));
   if (completedText.length) sections.push(`טיפול שבוצע:\n${unique(completedText).join(" ")}`);

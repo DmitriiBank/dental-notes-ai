@@ -307,7 +307,7 @@ export type PerformedTarget=
   |{type:"jaw";jaw:Jaw}
   |{type:"construction";constructionId:string;jaw:Jaw}
   |{type:"region";regionId:string};
-interface PerformedActBase {id:string;target:PerformedTarget;visitId:string;performedAt?:string;status:"completed";clinicianConfirmed:true;sourceTreatmentIds?:string[];sourceLabStageIds?:string[];sourceFirstAidIds?:string[]}
+interface PerformedActBase {id:string;target:PerformedTarget;visitId:string;performedAt?:string;status:"completed";clinicianConfirmed:true;withoutWarranty?:boolean;sourceTreatmentIds?:string[];sourceLabStageIds?:string[];sourceFirstAidIds?:string[]}
 export type RestorativePerformedKind="caries-removal"|"old-filling-removal"|"composite-filling"|"temporary-filling"|"cavity-liner"|"occlusal-adjustment"|"finishing-polishing"|"anesthesia";
 export interface RestorativePerformedAct extends PerformedActBase {category:"restorative";kind:RestorativePerformedKind;material?:"Filtek"|"Profil"|"IRM"|"Ledermix"|"other";shade?:"A1"|"A2"|"A3"|"A3.5"|"A4"|"B1"|"B2"|"B3"|"B4"|"C1"|"C2"|"C3"|"C4"|"D2"|"D3"|"D4"|"other";cariesType?:"primary"|"secondary";deepCaries?:boolean;oldFillingRemoved?:boolean;anesthesia?:{used:true;agent?:string;amount?:string}}
 export type FixedPerformedKind="direct-core"|"fiber-post-core"|"cast-core"|"crown-preparation"|"crown-impression"|"temporary-crown-placement"|"crown-recementation"|"framework-try-in"|"pfz-try-in"|"seat-check"|"occlusion-contact-check"|"permanent-cementation";
