@@ -2,6 +2,7 @@ import type { ConsultationReason, ConsultationReferral, ConsultationType } from 
 import { hebrewList } from "./hebrew-catalog";
 
 export const CONSULTATION_TYPES:Record<ConsultationType,{ru:string;he:string}>={
+  "pediatric-dentist":{ru:"Детский стоматолог",he:"רופא שיניים לילדים"},
   "prosthodontic-consultant":{ru:"Консультант по реабилитации",he:"יועץ שיקום"},"restorative-dentist":{ru:"Врач-реабилитолог",he:"רופא שיקום"},implantologist:{ru:"Имплантолог",he:"רופא שתלים"},periodontist:{ru:"Пародонтолог",he:"מומחה למחלות חניכיים"},endodontist:{ru:"Эндодонтист",he:"מומחה לטיפולי שורש"},"oral-maxillofacial-surgeon":{ru:"Челюстно-лицевой хирург",he:"כירורג פה ולסת"},"oral-medicine-specialist":{ru:"Специалист по медицине полости рта",he:"מומחה לרפואת הפה"},orthodontist:{ru:"Ортодонт",he:"אורתודונט"},hygienist:{ru:"Гигиенист",he:"שיננית"},
 };
 export const CONSULTATION_REASONS:Record<ConsultationReason,{ru:string;he:string}>={"implant-planning":{ru:"Планирование имплантации",he:"תכנון שתלים"},"questionable-restorability":{ru:"Сомнительная восстановимость",he:"הערכת יכולת שיקום"},"endodontic-pathology":{ru:"Эндодонтическая патология",he:"בירור פתולוגיה אנדודונטית"},"periodontal-evaluation":{ru:"Пародонтологическая оценка",he:"הערכה פריודונטלית"},"complex-prosthetic-rehabilitation":{ru:"Сложная ортопедическая реабилитация",he:"שיקום פרותטי מורכב"},"second-opinion":{ru:"Второе мнение",he:"חוות דעת נוספת"}};

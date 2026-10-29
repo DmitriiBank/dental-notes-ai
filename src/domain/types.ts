@@ -37,7 +37,7 @@ export interface ComplaintSelection {
   region?: string;
 }
 
-export type ConsultationType="prosthodontic-consultant"|"restorative-dentist"|"implantologist"|"periodontist"|"endodontist"|"oral-maxillofacial-surgeon"|"oral-medicine-specialist"|"orthodontist"|"hygienist";
+export type ConsultationType="pediatric-dentist"|"prosthodontic-consultant"|"restorative-dentist"|"implantologist"|"periodontist"|"endodontist"|"oral-maxillofacial-surgeon"|"oral-medicine-specialist"|"orthodontist"|"hygienist";
 export type ConsultationReason="implant-planning"|"questionable-restorability"|"endodontic-pathology"|"periodontal-evaluation"|"complex-prosthetic-rehabilitation"|"second-opinion";
 export type ConsultationTarget={kind:"teeth";teeth:number[]}|{kind:"jaw";jaw:Jaw}|{kind:"plan"};
 export interface ConsultationReferral {id:string;type:ConsultationType;target:ConsultationTarget;reasons:ConsultationReason[];status:"recommended"|"scheduled"|"completed"|"refused";completionConfirmed:boolean}
@@ -103,9 +103,11 @@ export type PatientDecision =
 
 export interface MedicationRecord {
   id: string;
-  presetId?: "augmentin-500-125" | "augmentin-875-125" | "azithromycin-penicillin-allergy" | "corsodyl-gel" | "ibuprofen-prn";
+  presetId?: "augmentin-500-125" | "augmentin-875-125" | "augmentin-pediatric-tablets" | "azithromycin-penicillin-allergy" | "corsodyl-gel" | "ibuprofen-prn";
   name: string;
   concentration?: string;
+  patientWeightKg?: number;
+  tabletSuitabilityConfirmed?: boolean;
   dose?: string;
   route?: string;
   frequency?: string;
@@ -269,6 +271,7 @@ export interface ClinicalDraft {
   treatmentOptions?: {first:string;second:string;decision?:"no-treatment"|"first"|"second";confirmed:boolean};
   alternativeTreatments?: Treatment[];
   labLetters?: Array<{id:string;teeth:number[];text:string}>;
+  extractionSites?: Array<{id:string;region:string;findings:string[]}>;
   existingDentures?: Array<{id:string;jaw:Jaw;kind:"complete"|"partial"|"flipper"|"implant-supported";findings:string[];notes?:string}>;
   generalTreatments: Treatment[];
   edentulous: Jaw[];

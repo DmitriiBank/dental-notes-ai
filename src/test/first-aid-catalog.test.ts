@@ -4,8 +4,8 @@ import { emptyDraft } from "@/domain/fixtures";
 import { generateHebrewRecord } from "@/domain/hebrew-templates";
 
 describe("first-aid clinical template catalog", () => {
-  it("contains all twelve specified scenarios and resolvable phrase references", () => {
-    expect(firstAidPresets).toHaveLength(12);
+  it("contains all thirteen specified scenarios and resolvable phrase references", () => {
+    expect(firstAidPresets).toHaveLength(13);
     const ids = new Set(clinicalPhrases.map(phrase => phrase.id));
     firstAidPresets.forEach(preset => {
       [...preset.complaint, ...preset.findings, ...preset.performed, ...preset.recommendations].forEach(id => expect(ids.has(id), `${preset.id}: ${id}`).toBe(true));
