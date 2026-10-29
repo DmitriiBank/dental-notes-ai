@@ -111,8 +111,9 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   if (complaints.length) sections.push(`סיבת הביקור:\n${unique(complaints).join(" ")}`);
   if (examination.extraoral.trim()) sections.push(`EO: ${sentence(examination.extraoral)}`);
   if (examination.softTissues.trim()) sections.push(`רקמות רכות: ${sentence(examination.softTissues)}`);
+  const occlusionMeasurements=[examination.overbiteMm!==undefined?`חפיפה אנכית: ${examination.overbiteMm} מ"מ`:"",examination.overjetMm!==undefined?`מרווח אופקי: ${examination.overjetMm} מ"מ`:""].filter(Boolean);
   const occlusionDetails=(examination.occlusionFindings??[]).map(id=>({"deep-bite":"סגר עמוק","open-bite":"מנשך פתוח","cross-bite":"מנשך צלבי","edge-to-edge":"מנשך קצה לקצה","increased-overjet":"מרווח אופקי מוגדל","reduced-vertical-dimension":"ירידה בגובה הסגר","premature-contact":"מגע סגרי מוקדם"} as Record<string,string>)[id]).filter(Boolean);
-  if (examination.occlusion.trim()||occlusionDetails.length) sections.push(`סגר: ${sentence([examination.occlusion.trim(),...occlusionDetails].filter(Boolean).join("; "))}`);
+  if (examination.occlusion.trim()||occlusionDetails.length||occlusionMeasurements.length) sections.push(`סגר: ${sentence([examination.occlusion.trim(),...occlusionDetails,...occlusionMeasurements].filter(Boolean).join("; "))}`);
   if (examination.hygiene.trim()) sections.push(`OH: ${sentence(examination.hygiene)}`);
   if (examination.periodontal.trim()) sections.push(`פמ"ר: ${sentence(examination.periodontal)}`);
   if (examination.medicalFlags.length) sections.push(`אנמנזה רפואית:\n${sentence(hebrewList(unique(examination.medicalFlags)))}`);
