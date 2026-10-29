@@ -23,7 +23,7 @@ describe("simplified prosthodontic lab letters and alternatives",()=>{
     draft.labLetters=[{id:"lab-1",teeth:[26],text:"נא לא לצפות את המשטח הפלטינלי בחרסינה"}];
     const text=generateHebrewRecord(draft);
     expect(text).toContain("הוראות למעבדה");
-    expect(text).toContain("שיניים 26");
+    expect(text).toContain("שיניים: 26");
     expect(text).toContain("נא לא לצפות");
     expect(text).toContain("גוון: A3");
   });
