@@ -29,4 +29,17 @@ describe("sinus imaging and orthodontic clinical findings",()=>{
   expect(note).toContain("עיבוי רירית בסינוס המקסילרי");
   expect(note).not.toContain("הצללה רדיולוצנטית פריאפיקלית");
  });
+ it("keeps hygienist recommendation concise",()=>{
+  const d=emptyDraft();d.generalTreatments=[{id:"h1",kind:"hygienist",status:"recommended"}];
+  expect(generateHebrewRecord(d)).toContain("הומלץ שיננית");
+ });
+ it("does not mention caries surfaces or surgeon in extraction recommendation",()=>{
+  const d=emptyDraft();d.teeth[26].treatments=[{id:"e1",kind:"extraction",status:"recommended",tooth:26,surfaces:["M","O","D"]}];
+  const output=generateHebrewRecord(d);
+  expect(output).toContain("הומלץ עקירת שן 26");
+  expect(output).not.toContain("משטחים MOD");
+  expect(output).not.toContain("כירורג");
+  expect(output).not.toContain("אצל רופא אחר");
+ });
+
 });
