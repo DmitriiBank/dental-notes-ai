@@ -55,7 +55,7 @@ export function toothSpecificClinicalDetails(draft:ClinicalDraft):string[]{
   Object.values(draft.teeth).filter(tooth=>!tooth.missing).sort((a,b)=>a.number-b.number).forEach(tooth=>{
     unique(tooth.symptoms).forEach(symptom=>result.push(sentence(`שן ${tooth.number}, לפי דיווח המטופל: ${SYMPTOM_HEBREW[symptom]??symptom}`)));
     if(tooth.notes?.trim())result.push(sentence(`שן ${tooth.number}: ${tooth.notes.trim()}`));
-    if(tooth.findings.includes("deep-caries"))result.push(sentence(`שן ${tooth.number}: ייתכן צורך בטיפול שורש בהתאם למצב המוך ולממצאים במהלך הטיפול, ללא אבחנה אנדודונטית סופית בשלב זה`));
+
   });
   return result;
 }
