@@ -47,6 +47,13 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
     if(!decision.documentedExplanation&&(decision.risksExplained||decision.alternativesExplained))add(`decision-explanation-${decision.id}`,"blocking","Риски или альтернативы нельзя отметить без подтвержденного документированного объяснения.");
   });
   (d.medications ?? []).forEach(medication => {
+    if (medication.presetId==="augmentin-pediatric-tablets"){
+      if(!medication.patientWeightKg||!Number.isFinite(medication.patientWeightKg)||medication.patientWeightKg<=0)add(`pediatric-augmentin-weight-${medication.id}`,"blocking","Для детского Аугментина в таблетках требуется указать проверенный вес ребёнка.");
+      if(!medication.tabletSuitabilityConfirmed)add(`pediatric-augmentin-tablet-${medication.id}`,"blocking","Не подтверждена пригодность таблетированной формы и концентрации для ребёнка.");
+      if(!medication.clinicianSelectionConfirmed)add(`pediatric-augmentin-confirmation-${medication.id}`,"blocking","Детскую дозировку Аугментина в таблетках должен подтвердить врач.");
+      if(!medication.concentration?.trim()||!medication.dose?.trim()||!medication.frequency?.trim()||!medication.duration?.trim())add(`pediatric-augmentin-dose-${medication.id}`,"blocking","Требуется явно указать концентрацию таблетки, дозу, частоту и длительность лечения.");
+      if(medication.allergyCheck==="allergy-present")add(`pediatric-augmentin-allergy-${medication.id}`,"blocking","При отмеченной аллергии необходимо пересмотреть выбор Аугментина.");
+    }
     if (!medication.name.trim()) add(`medication-name-${medication.id}`, "blocking", "Для лекарственной записи необходимо явно указать название препарата.");
     if (medication.allergyCheck === "not-checked") add(`medication-allergy-${medication.id}`, "review", "Проверка лекарственной аллергии не подтверждена.");
     if (medication.penicillinAllergyAlternative && !medication.clinicianSelectionConfirmed) add(`medication-alternative-${medication.id}`, "blocking", "Антибиотик при аллергии на пенициллин требует явного подтверждения выбора врачом.");
