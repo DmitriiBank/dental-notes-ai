@@ -34,6 +34,8 @@ export const HEBREW_FINDINGS: Record<string, HebrewPhrase> = {
   wear: { label: "שחיקת שיניים" },
   filling: { label: "שחזור קיים" },
   "defective-filling": { label: "שחזור לקוי" },
+  "discolored-filling": { label: "שינוי צבע של שחזור קיים" },
+  "marginal-staining": { label: "צביעה בשולי השחזור" },
   "fractured-filling": { label: "שחזור שבור" },
   "artificial-crown": { label: "כתר מלאכותי קיים" },
   "defective-crown": { label: "כתר מלאכותי לקוי" },
