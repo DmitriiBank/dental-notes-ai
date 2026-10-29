@@ -1,7 +1,7 @@
 export interface RadiographicFindingOption {
   id: string;
   ru: string;
-  group: "periapical" | "endodontic" | "restorative" | "periodontal" | "implant" | "other";
+  group: "periapical" | "endodontic" | "restorative" | "periodontal" | "implant" | "sinus" | "other";
 }
 
 export const RADIOGRAPHIC_FINDINGS: RadiographicFindingOption[] = [
@@ -34,6 +34,11 @@ export const RADIOGRAPHIC_FINDINGS: RadiographicFindingOption[] = [
   { id:"impacted", ru:"Ретинированный зуб", group:"other" },
   { id:"partially-impacted", ru:"Частично ретинированный зуб", group:"other" },
   { id:"residual-root", ru:"Остаточный корень", group:"other" },
+  { id:"sinus-mucosal-thickening", ru:"Утолщение слизистой верхнечелюстной пазухи", group:"sinus" },
+  { id:"sinus-floor-opacity", ru:"Затемнение дна верхнечелюстной пазухи в проекции верхушек корней", group:"sinus" },
+  { id:"sinus-opacity", ru:"Затемнение верхнечелюстной пазухи", group:"sinus" },
+  { id:"sinus-cyst-like-dome", ru:"Куполообразное затемнение в пазухе (без указания диагноза)", group:"sinus" },
+  { id:"sinus-normal-visible", ru:"Без особенностей в видимой части верхнечелюстной пазухи", group:"sinus" },
 ] as const;
 
 export const PERIAPICAL_NORMAL_FINDING = "periapical-normal";
@@ -52,5 +57,6 @@ export const RADIOGRAPHIC_GROUP_LABELS: Record<RadiographicFindingOption["group"
   restorative:"Кариес и реставрации",
   periodontal:"Пародонт",
   implant:"Импланты",
+  sinus:"Верхнечелюстная пазуха",
   other:"Другие находки",
 };

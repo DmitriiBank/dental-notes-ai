@@ -37,6 +37,8 @@ function imagingSentence(imaging: Imaging): string {
 
 function treatmentText(treatment: Treatment): string {
   const target = treatment.tooth ? `בשן ${treatment.tooth} ` : treatment.jaw === "upper" ? "ללסת העליונה " : treatment.jaw === "lower" ? "ללסת התחתונה " : "";
+  if(treatment.kind==="hygienist")return "שיננית";
+  if(treatment.kind==="extraction"||treatment.kind==="surgical-extraction")return `עקירת שן${treatment.tooth?` ${treatment.tooth}`:""}`;
   const details = [treatment.surfaces?.length?`משטחים ${unique(treatment.surfaces).join("")}`:"",treatment.material ? `חומר ${treatment.material}` : "", treatment.shade ? `גוון ${treatment.shade}` : "",treatment.followUpDays?`בעוד ${treatment.followUpDays} ימים`:""].filter(Boolean);
   return `${target}${phrase(HEBREW_TREATMENTS, treatment.kind)}${details.length ? `, ${details.join(", ")}` : ""}`;
 }
@@ -79,11 +81,12 @@ function groupedTreatmentText(group: Treatment[]): string {
     const replacements=treatment.kind==="partial-denture"&&treatment.includeReplacedTeethInText&&treatment.replacedTeeth?.length?`שיניים להשלמה ${hebrewList(treatment.replacedTeeth.map(String))}`:"";
     return [target,replacements,treatment.material?`חומר ${treatment.material}`:""].filter(Boolean).join(", ");
   }
+  if(treatment.kind==="hygienist")return "שיננית";
   const teeth = unique(group.map(item => item.tooth).filter((tooth): tooth is number => tooth !== undefined)).sort((a, b) => a - b);
   if (teeth.length <= 1) return treatmentText(treatment);
-  const surfaceTargets=group.map(item=>item.tooth===undefined?"":`${item.tooth}${item.surfaces?.length?` (${unique(item.surfaces).join("")})`:""}`).filter(Boolean);
+  const surfaceTargets=group.map(item=>item.tooth===undefined?"":`${item.tooth}${!["extraction","surgical-extraction"].includes(treatment.kind)&&item.surfaces?.length?` (${unique(item.surfaces).join("")})`:""}`).filter(Boolean);
   const details = [treatment.material ? `חומר ${treatment.material}` : "", treatment.shade ? `גוון ${treatment.shade}` : "",treatment.followUpDays?`בעוד ${treatment.followUpDays} ימים`:""].filter(Boolean);
-  const procedure = phrase(HEBREW_TREATMENTS, treatment.kind);
+  const procedure = ["extraction","surgical-extraction"].includes(treatment.kind)?"עקירה":phrase(HEBREW_TREATMENTS, treatment.kind);
   const target = BRIDGE_TREATMENTS.has(treatment.kind)
     ? `${procedure} משן ${teeth[0]} עד שן ${teeth.at(-1)}`
     : `${procedure} בשיניים ${hebrewList(surfaceTargets)}`;

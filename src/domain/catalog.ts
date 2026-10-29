@@ -3,8 +3,9 @@ export const FINDINGS = [
   ["primary-caries", "Первичный кариес"], ["secondary-caries", "Вторичный кариес"], ["deep-caries", "Глубокий кариес"],
   ["cervical-caries", "Пришеечный кариес"], ["root-caries", "Кариес корня"], ["crown-destruction", "Разрушение анатомической коронки"], ["subgingival-destruction", "Разрушение ниже десны"], ["residual-root", "Остаточный корень"],
   ["fracture", "Перелом зуба"], ["crack", "Трещина"], ["chip", "Скол"], ["cervical-lesion", "Некариозное пришеечное поражение"], ["wear", "Стираемость"], ["filling", "Существующая пломба"],
-  ["defective-filling", "Дефектная пломба"], ["artificial-crown", "Искусственная коронка"], ["defective-crown", "Дефектная коронка"],
+  ["defective-filling", "Дефектная пломба"], ["discolored-filling", "Изменение цвета существующей пломбы"], ["marginal-staining", "Окрашивание края пломбы"], ["artificial-crown", "Искусственная коронка"], ["defective-crown", "Дефектная коронка"],
   ["fractured-filling", "Сломанная пломба"], ["loose-crown", "Подвижная коронка"], ["crown-with-root", "Коронка подвижна вместе с тканями корня"], ["temporary-crown-existing", "Существующая временная коронка"], ["bridge-abutment", "Опора моста"], ["bridge-pontic", "Промежуточная часть моста"], ["post-core", "Штифтовая культевая вкладка"], ["fiber-post", "Стекловолоконный штифт"],
+  ["dental-splint", "Шинирование зубов (קיבוע)"], ["orthodontic-wire", "Ортодонтическая дуга"], ["ortho-brackets", "Ортодонтические брекеты"], ["supraeruption", "Супраэррупция: выдвижение зуба к антагонистам"],
   ["mobility", "Подвижность зуба"], ["no-mobility", "Зуб неподвижен"], ["recession", "Рецессия десны"], ["pocket", "Пародонтальный карман"], ["no-pockets", "Пародонтальные карманы отсутствуют"],
   ["inflammation", "Воспаление десны"], ["bleeding", "Кровоточивость"], ["bone-loss", "Убыль кости"],
   ["furcation", "Вовлечение фуркации"], ["treated-canals", "Ранее леченные каналы"], ["incomplete-rct", "Неполная обтурация каналов"], ["suspected-endo", "Подозрение на эндодонтическую патологию"],
@@ -73,6 +74,8 @@ export const FINDING_GROUPS = [
     "ids": [
       "filling",
       "defective-filling",
+      "discolored-filling",
+      "marginal-staining",
       "fractured-filling",
       "artificial-crown",
       "defective-crown",
@@ -82,7 +85,10 @@ export const FINDING_GROUPS = [
       "bridge-abutment",
       "bridge-pontic",
       "post-core",
-      "fiber-post"
+      "fiber-post",
+      "dental-splint",
+      "orthodontic-wire",
+      "ortho-brackets"
     ]
   },
   {
@@ -128,6 +134,7 @@ export const FINDING_GROUPS = [
       "partially-impacted",
       "dystopic",
       "buccal",
+      "supraeruption",
       "soft-tissue-trauma"
     ]
   }
