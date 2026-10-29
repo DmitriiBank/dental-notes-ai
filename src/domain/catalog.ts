@@ -1,4 +1,5 @@
 export const FINDINGS = [
+  ["percussion-positive", "Перкуссия болезненна"],   ["percussion-negative", "Перкуссия безболезненна"],   ["palpation-positive", "Пальпация болезненна"],   ["palpation-negative", "Пальпация безболезненна"],   ["cold-normal", "Холод: кратковременная реакция"],   ["cold-negative", "Холод: нет реакции"],   ["cold-prolonged", "Холод: длительная реакция"],   ["short-clinical-crown", "Низкая клиническая коронка"],   ["insufficient-ferrule", "Недостаточный феррул"],   ["insufficient-retention", "Недостаточная ретенция для коронки"],   ["insufficient-tooth-structure", "Недостаточный объём тканей коронки"],   ["insufficient-prosthetic-space", "Недостаточное место для реставрации"],   ["deep-subgingival-margin", "Глубокая поддесневая граница"],
   ["primary-caries", "Первичный кариес"], ["secondary-caries", "Вторичный кариес"], ["deep-caries", "Глубокий кариес"],
   ["cervical-caries", "Пришеечный кариес"], ["root-caries", "Кариес корня"], ["crown-destruction", "Разрушение анатомической коронки"], ["subgingival-destruction", "Разрушение ниже десны"], ["residual-root", "Остаточный корень"],
   ["fracture", "Перелом зуба"], ["crack", "Трещина"], ["chip", "Скол"], ["cervical-lesion", "Некариозное пришеечное поражение"], ["wear", "Стираемость"], ["filling", "Существующая пломба"],
@@ -41,7 +42,8 @@ export const FINDING_GROUPS = [
       "percussion-negative",
       "palpation-positive",
       "palpation-negative",
-      "cold-positive",
+      "cold-normal",
+      "cold-prolonged",
       "cold-negative"
     ]
   },
@@ -63,7 +65,13 @@ export const FINDING_GROUPS = [
       "crack",
       "chip",
       "short-roots",
-      "poor-prognosis"
+      "poor-prognosis",
+      "short-clinical-crown",
+      "insufficient-ferrule",
+      "insufficient-retention",
+      "insufficient-tooth-structure",
+      "insufficient-prosthetic-space",
+      "deep-subgingival-margin"
     ]
   },
   {
@@ -120,3 +128,5 @@ export const FINDING_GROUPS = [
   }
 ] as const;
 export const findingGroupFor = (id:string):string => FINDING_GROUPS.find(group=>(group.ids as readonly string[]).includes(id))?.label??"Другие находки";
+
+export const OCCLUSION_FINDINGS = [{"id":"deep-bite","ru":"Глубокий прикус","he":"סגר עמוק"},{"id":"open-bite","ru":"Открытый прикус","he":"מנשך פתוח"},{"id":"cross-bite","ru":"Перекрёстный прикус","he":"מנשך צלבי"},{"id":"edge-to-edge","ru":"Прямой прикус","he":"מנשך קצה לקצה"},{"id":"increased-overjet","ru":"Увеличенное горизонтальное перекрытие","he":"מרווח אופקי מוגדל"},{"id":"reduced-vertical-dimension","ru":"Снижение высоты прикуса","he":"ירידה בגובה הסגר"},{"id":"premature-contact","ru":"Преждевременный контакт","he":"מגע סגרי מוקדם"}] as const;
