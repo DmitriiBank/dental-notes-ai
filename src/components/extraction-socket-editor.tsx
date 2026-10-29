@@ -1,0 +1,21 @@
+"use client";
+import {useExamStore} from "@/store/examination-store";
+export const EXTRACTION_SOCKET_FINDINGS=[
+ {id:"healing-normal",ru:"Заживление лунки без особенностей",he:"ריפוי תקין של מכתשית העקירה"},
+ {id:"clot-present",ru:"Кровяной сгусток сохранён",he:"קריש דם קיים במכתשית העקירה"},
+ {id:"clot-absent",ru:"Кровяной сгусток отсутствует",he:"לא נצפה קריש דם במכתשית העקירה"},
+ {id:"socket-tender",ru:"Болезненность лунки",he:"רגישות באזור מכתשית העקירה"},
+ {id:"exposed-bone",ru:"Обнажённая кость в лунке",he:"עצם חשופה במכתשית העקירה"},
+ {id:"fibrin",ru:"Фибринозный налёт в лунке",he:"רובד פיברין במכתשית העקירה"},
+ {id:"granulation",ru:"Грануляционная ткань",he:"רקמת גרנולציה במכתשית העקירה"},
+ {id:"swelling",ru:"Отёк тканей вокруг лунки",he:"נפיחות ברקמות סביב מכתשית העקירה"},
+ {id:"suppuration",ru:"Гнойное отделяемое",he:"הפרשה מוגלתית ממכתשית העקירה"},
+ {id:"alveolitis-confirmed",ru:"Альвеолит (диагноз подтверждён врачом)",he:"אובחנה דלקת מכתשית לאחר עקירה"}
+] as const;
+export function ExtractionSocketEditor(){
+ const s=useExamStore(),sites=s.draft.extractionSites??[];
+ return <section className="mt-4 rounded-xl border p-3"><div className="text-sm font-bold">Состояние после удаления · осмотр лунки</div><p className="mt-1 text-xs text-slate-500">Отметьте только увиденные находки. «Заживление без особенностей» не выбирается автоматически.</p>
+ <button type="button" className="btn mt-2 text-xs" onClick={()=>s.update(d=>{d.extractionSites??=[];d.extractionSites.push({id:crypto.randomUUID(),region:"",findings:[]})})}>Добавить область удаления</button>
+ {sites.map(site=><div key={site.id} className="mt-3 rounded-lg border p-3"><div className="flex justify-between gap-2"><label className="flex-1 text-xs font-medium">Удалённый зуб / область<input className="mt-1 w-full rounded border p-2" value={site.region} placeholder="например, 38" onChange={e=>s.update(d=>{const x=d.extractionSites?.find(a=>a.id===site.id);if(x)x.region=e.target.value})}/></label><button className="text-xs text-red-700" onClick={()=>s.update(d=>{d.extractionSites=d.extractionSites?.filter(a=>a.id!==site.id)})}>Удалить</button></div>
+ <div className="mt-2 grid grid-cols-2 gap-2">{EXTRACTION_SOCKET_FINDINGS.map(f=><button key={f.id} type="button" aria-pressed={site.findings.includes(f.id)} className={`rounded border p-2 text-left text-xs ${site.findings.includes(f.id)?"border-teal-500 bg-teal-50":"hover:border-teal-400"}`} onClick={()=>s.update(d=>{const x=d.extractionSites?.find(a=>a.id===site.id);if(!x)return;if(x.findings.includes(f.id)){x.findings=x.findings.filter(v=>v!==f.id);return}if(f.id==="healing-normal")x.findings=[f.id];else x.findings=[...x.findings.filter(v=>v!=="healing-normal"&&(f.id!=="clot-present"||v!=="clot-absent")&&(f.id!=="clot-absent"||v!=="clot-present")),f.id]})}>{f.ru}</button>)}</div></div>)}</section>;
+}
