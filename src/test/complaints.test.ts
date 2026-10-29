@@ -9,7 +9,7 @@ describe("versioned complaint catalog with the 107 supplied entries and the adde
 
   it("contains exactly 111 unique deterministic entries",()=>{
     expect(COMPLAINT_CATALOG).toHaveLength(111);
-    expect(new Set(COMPLAINT_CATALOG.map(item=>item.id)).size).toBe(108);
+    expect(new Set(COMPLAINT_CATALOG.map(item=>item.id)).size).toBe(111);
     expect(COMPLAINT_CATALOG.every(item=>item.ru&&item.he&&item.category&&item.scope)).toBe(true);
   });
 
