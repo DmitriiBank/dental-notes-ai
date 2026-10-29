@@ -111,7 +111,8 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   if (complaints.length) sections.push(`סיבת הביקור:\n${unique(complaints).join(" ")}`);
   if (examination.extraoral.trim()) sections.push(`EO: ${sentence(examination.extraoral)}`);
   if (examination.softTissues.trim()) sections.push(`רקמות רכות: ${sentence(examination.softTissues)}`);
-  if (examination.occlusion.trim()) sections.push(`סגר: ${sentence(examination.occlusion)}`);
+  const occlusionDetails=(examination.occlusionFindings??[]).map(id=>({"deep-bite":"סגר עמוק","open-bite":"מנשך פתוח","cross-bite":"מנשך צלבי","edge-to-edge":"מנשך קצה לקצה","increased-overjet":"מרווח אופקי מוגדל","reduced-vertical-dimension":"ירידה בגובה הסגר","premature-contact":"מגע סגרי מוקדם"} as Record<string,string>)[id]).filter(Boolean);
+  if (examination.occlusion.trim()||occlusionDetails.length) sections.push(`סגר: ${sentence([examination.occlusion.trim(),...occlusionDetails].filter(Boolean).join("; "))}`);
   if (examination.hygiene.trim()) sections.push(`OH: ${sentence(examination.hygiene)}`);
   if (examination.periodontal.trim()) sections.push(`פמ"ר: ${sentence(examination.periodontal)}`);
   if (examination.medicalFlags.length) sections.push(`אנמנזה רפואית:\n${sentence(hebrewList(unique(examination.medicalFlags)))}`);
@@ -126,8 +127,8 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   aggregateClinicalFindings(draft).forEach(group=>clinicalFindings.push(group.text));
   clinicalFindings.push(...toothSpecificClinicalDetails(draft));
   (draft.regionalClinicalFindings??[]).filter(item=>item.clinicianConfirmed).forEach(item=>clinicalFindings.push(sentence(`${item.region==="lower-left"?"באזור הרטרומולרי השמאלי התחתון":item.region==="lower-right"?"באזור הרטרומולרי הימני התחתון":item.region==="upper-left"?"באזור הרטרומולרי השמאלי העליון":"באזור הרטרומולרי הימני העליון"}: ${item.id==="retromolar-tender-fold"?"קפל רירית רגיש במישוש":"לא נצפו סימני דלקת"}`)));
-  const missing = Object.values(draft.teeth).filter(tooth => tooth.missing).map(tooth => String(tooth.number));
-  if (missing.length && !draft.edentulous.length) clinicalFindings.push(sentence(`שיניים ${hebrewList(missing)} חסרות`));
+  const missing = Object.values(draft.teeth).filter(tooth => tooth.missing && !draft.edentulous.includes(tooth.number<30?"upper":"lower")).map(tooth => String(tooth.number));
+  if (missing.length) clinicalFindings.push(sentence(`שיניים ${hebrewList(missing)} חסרות`));
   const recommendedDetails=examination.details.filter(detail=>/^הומלץ/u.test(detail.trim()));
   examination.details.filter(detail=>!recommendedDetails.includes(detail)).forEach(detail => clinicalFindings.push(sentence(detail)));
   draft.implants.forEach(implant => {
