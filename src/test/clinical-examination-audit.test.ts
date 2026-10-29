@@ -37,6 +37,8 @@ describe("clinical examination audit regressions",()=>{
    expect(ids).toContain("test-conflict-percussion-36");
    expect(ids).toContain("test-conflict-cold-36");
  });
+ it("documents exact measured crown height and six site probing without guessing",()=>{const draft=emptyDraft();draft.teeth[16].clinicalCrownHeightMm=2.5;draft.teeth[16].probingDepthsMm={MB:4,B:3,DB:5,ML:3,L:3,DL:4};draft.teeth[16].mobilityGrade=2;draft.teeth[16].bleedingOnProbing=true;const text=generateHebrewRecord(draft);expect(text).toContain('גובה כותרת קלינית 2.5');expect(text).toContain('MB: 4');expect(text).toContain('ניידות דרגה 2');expect(text).toContain('דימום בבדיקת כיסים');});
+ it("records measured overbite and overjet",()=>{const draft=emptyDraft();draft.examination.overbiteMm=5;draft.examination.overjetMm=3;const text=generateHebrewRecord(draft);expect(text).toContain('חפיפה אנכית: 5');expect(text).toContain('מרווח אופקי: 3');});
  it("categorizes all available clinical findings",()=>{
    for(const [id] of FINDINGS)expect(FINDING_GROUPS.filter(g=>(g.ids as readonly string[]).includes(id)),id).toHaveLength(1);
  });
