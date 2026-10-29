@@ -132,7 +132,7 @@ export function generateHebrewRecord(draft: ClinicalDraft): string {
   aggregateClinicalFindings(draft).forEach(group=>clinicalFindings.push(group.text));
   clinicalFindings.push(...toothSpecificClinicalDetails(draft));
   const dentureKinds={complete:"תותבת שלמה",partial:"תותבת חלקית",flipper:"פליפר","implant-supported":"תותבת נתמכת שתלים"} as const;
-  (draft.existingDentures??[]).forEach(item=>{const region=item.jaw==="upper"?"בלסת העליונה":"בלסת התחתונה";const findings=DENTURE_FINDINGS.filter(f=>item.findings.includes(f.id)).map(f=>f.he);if(item.notes?.trim())findings.push(item.notes.trim());if(findings.length)clinicalFindings.push(sentence(`${dentureKinds[item.kind]} קיימת ${region}: ${[...new Set(findings)].join("; ")}`))});
+  (draft.existingDentures??[]).forEach(item=>{const region=item.jaw==="upper"?"בלסת העליונה":"בלסת התחתונה";const findings:string[]=DENTURE_FINDINGS.filter(f=>item.findings.includes(f.id)).map(f=>f.he);if(item.notes?.trim())findings.push(item.notes.trim());if(findings.length)clinicalFindings.push(sentence(`${dentureKinds[item.kind]} קיימת ${region}: ${[...new Set(findings)].join("; ")}`))});
 
   (draft.regionalClinicalFindings??[]).filter(item=>item.clinicianConfirmed).forEach(item=>clinicalFindings.push(sentence(`${item.region==="lower-left"?"באזור הרטרומולרי השמאלי התחתון":item.region==="lower-right"?"באזור הרטרומולרי הימני התחתון":item.region==="upper-left"?"באזור הרטרומולרי השמאלי העליון":"באזור הרטרומולרי הימני העליון"}: ${item.id==="retromolar-tender-fold"?"קפל רירית רגיש במישוש":"לא נצפו סימני דלקת"}`)));
   const missing = Object.values(draft.teeth).filter(tooth => tooth.missing && !draft.edentulous.includes(tooth.number<30?"upper":"lower")).map(tooth => String(tooth.number));
