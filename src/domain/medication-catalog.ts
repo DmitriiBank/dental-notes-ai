@@ -1,6 +1,6 @@
 import type { MedicationRecord } from "./types";
 
-export type MedicationPresetId = "augmentin-500-125" | "augmentin-875-125" | "azithromycin-penicillin-allergy" | "corsodyl-gel" | "ibuprofen-prn";
+export type MedicationPresetId = "augmentin-pediatric-tablets" | "augmentin-500-125" | "augmentin-875-125" | "azithromycin-penicillin-allergy" | "corsodyl-gel" | "ibuprofen-prn";
 
 export interface MedicationPreset {
   id: MedicationPresetId;
@@ -14,6 +14,16 @@ export interface MedicationPreset {
 }
 
 export const MEDICATION_PRESETS: readonly MedicationPreset[] = [
+  {
+    id: "augmentin-pediatric-tablets",
+    label: "Аугментин — таблетки, детская дозировка (ввести вручную)",
+    name: "Augmentin",
+    concentration: "",
+    activeIngredients: ["amoxicillin", "clavulanic acid"],
+    penicillinAllergyAlternative: false,
+    requiresClinicianConfirmation: true,
+    status: "recommended",
+  },
   {
     id: "augmentin-500-125",
     label: "Аугментин 500/125 мг",
