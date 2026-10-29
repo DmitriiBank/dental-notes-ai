@@ -241,6 +241,7 @@ export interface Examination {
   extraoral: string;
   softTissues: string;
   occlusion: string;
+  occlusionFindings?: string[];
   hygiene: string;
   periodontal: string;
   details: string[];
