@@ -47,13 +47,12 @@ export const RADIOGRAPHIC_FINDINGS: RadiographicFindingOption[] = [
 ] as const;
 
 export const PERIAPICAL_NORMAL_FINDING = "periapical-normal";
+// Only findings explicitly describing abnormal periapical tissues contradict a normal periapical assessment.
+// Root resorption, lateral/furcation defects and endodontic filling quality are independently documentable.
 export const PERIAPICAL_PATHOLOGY_FINDINGS = new Set([
   "periapical",
   "widened-pdl",
   "lamina-dura-loss",
-  "lateral-radiolucency",
-  "furcation-radiolucency",
-  "apical-root-resorption",
 ]);
 
 export const RADIOGRAPHIC_GROUP_LABELS: Record<RadiographicFindingOption["group"], string> = {
