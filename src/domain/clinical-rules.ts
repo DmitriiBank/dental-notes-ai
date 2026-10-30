@@ -20,7 +20,7 @@ export function validateDraft(d: ClinicalDraft): ValidationIssue[] {
     if(pathology)add("oral-cavity-normal-conflict","blocking","Общее заключение «без патологий» противоречит отмеченным патологическим находкам или зубным отложениям.");
   }
   Object.values(d.teeth).forEach(t => {
-    if (t.missing && (t.findings.length || t.treatments.some(x => !["implant-consult"].includes(x.kind)))) add(`missing-${t.number}`, "blocking", `Зуб ${t.number}: отсутствующий естественный зуб содержит несовместимые данные.`);
+    if (t.missing && (t.findings.length || t.treatments.some(x => !["implant-consult","implant-placement","implant-crown","implant-core","implant-bridge"].includes(x.kind)))) add(`missing-${t.number}`, "blocking", `Зуб ${t.number}: отсутствующий естественный зуб содержит несовместимые данные.`);
     for(const [key,value,max] of [["clinicalCrownHeightMm",t.clinicalCrownHeightMm,25],["recessionMm",t.recessionMm,20],...Object.entries(t.probingDepthsMm??{}).map(([site,value])=>[`probing-${site}`,value,15] as const)] as const){if(value!==undefined&&(!Number.isFinite(value)||value<0||value>max))add(`measurement-${key}-${t.number}`,"blocking",`Зуб ${t.number}: измерение ${key} вне допустимого диапазона.`)}
     if(t.mobilityGrade!==undefined&&t.findings.includes("no-mobility"))add(`mobility-grade-conflict-${t.number}`,"blocking",`Зуб ${t.number}: измерена подвижность и одновременно указано её отсутствие.`);
     if (t.findings.some(f => f.includes("caries")) && !t.surfaces.length) add(`surface-${t.number}`, "review", `Зуб ${t.number}: для кариеса не выбраны поверхности.`);
