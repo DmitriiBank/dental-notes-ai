@@ -28,7 +28,7 @@ function imagingSentence(imaging: Imaging): string {
   const target = imaging.target ? ` עבור ${imaging.target}` : "";
   const purpose = imaging.purpose === "crown-fit-check" ? " לצורך בדיקת התאמת הכתר" : "";
   if (imaging.status === "refused") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}${purpose}`);
-  if (imaging.status !== "reviewed") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}`);
+  if (imaging.status !== "reviewed") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}${purpose}`);
   const findingText = unique(imaging.findings).map(key => phrase(HEBREW_FINDINGS, key));
   const fractureDetails=imaging.findings.some(key=>key==="root-fracture-suspected"||key==="root-fracture-observed")
     ? [imaging.rootFractureLocation&&imaging.rootFractureLocation!=="unknown"?`מיקום ${imaging.rootFractureLocation}`:"",imaging.rootFractureOrientation&&imaging.rootFractureOrientation!=="undetermined"?`כיוון ${imaging.rootFractureOrientation}`:""].filter(Boolean).join(", ")
