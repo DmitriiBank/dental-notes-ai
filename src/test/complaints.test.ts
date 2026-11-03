@@ -38,12 +38,23 @@ describe("versioned complaint catalog with the 107 supplied entries and the adde
     expect(useExamStore.getState().draft.teeth[26].complaints).toEqual([{complaintId:"night-pain"}]);
   });
 
+  it("attaches a single tooth number without a comma or repeated בשן",()=>{
+    const draft=emptyDraft();draft.teeth[26].complaints=[{complaintId:"tooth-pain"}];
+    expect(complaintSentences(draft)).toEqual(["לדברי המטופל/ת, כאב בשן 26."]);
+    expect(generateHebrewRecord(draft)).not.toContain("בשן, בשן");
+  });
+
+  it("joins regional location to the complaint without repeated בלסת",()=>{
+    const draft=emptyDraft();draft.regionalComplaints=[{complaintId:"jaw-pain",region:"upper-left"}];
+    expect(complaintSentences(draft)).toEqual(["לדברי המטופל/ת, כאב בלסת העליונה משמאל."]);
+  });
+
   it("deduplicates an identical complaint while retaining all tooth locations",()=>{
     const draft=emptyDraft();draft.teeth[11].complaints=[{complaintId:"cold",intensity:"moderate"}];draft.teeth[12].complaints=[{complaintId:"cold",intensity:"moderate"}];
     const sentences=complaintSentences(draft);
-    expect(sentences).toEqual(["לדברי המטופל/ת, רגישות לקור, בשיניים 11 ו12, בעוצמה בינונית."]);
+    expect(sentences).toEqual(["לדברי המטופל/ת, רגישות לקור בשיניים 11 ו12, בעוצמה בינונית."]);
     const record=generateHebrewRecord(draft);
-    expect(record).toContain("סיבת הביקור:\nלדברי המטופל/ת, רגישות לקור, בשיניים 11 ו12");
+    expect(record).toContain("סיבת הביקור:\nלדברי המטופל/ת, רגישות לקור בשיניים 11 ו12");
     expect(record.match(/רגישות לקור/gu)).toHaveLength(1);
   });
 
@@ -51,7 +62,7 @@ describe("versioned complaint catalog with the 107 supplied entries and the adde
     const draft=emptyDraft();draft.regionalComplaints=[{complaintId:"gum-swelling",region:"upper-right"}];draft.generalComplaints=[{complaintId:"chewing-difficult"}];
     const record=generateHebrewRecord(draft);
     const reason=record.split("סיבת הביקור:\n")[1].split("\n\n")[0];
-    expect(reason).toContain("נפיחות בחניכיים, בלסת העליונה מימין");
+    expect(reason).toContain("נפיחות בחניכיים בלסת העליונה מימין");
     expect(reason).toContain("קושי בלעיסה");
     expect(record).not.toContain("ממצאים קליניים");
   });
