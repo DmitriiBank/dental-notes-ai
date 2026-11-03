@@ -30,6 +30,8 @@ export const RADIOGRAPHIC_FINDINGS: RadiographicFindingOption[] = [
   { id:"root-caries", ru:"Кариес корня", group:"restorative" },
   { id:"secondary-caries", ru:"Вторичный кариес", group:"restorative" },
   { id:"defective-restoration-margin", ru:"Нарушение краевого прилегания реставрации", group:"restorative" },
+  { id:"crown-margin-adapted", ru:"Краевое прилегание коронки удовлетворительное", group:"restorative" },
+  { id:"crown-margin-gap", ru:"Нарушение краевого прилегания коронки", group:"restorative" },
   { id:"bone-loss", ru:"Убыль кости", group:"periodontal" },
   { id:"horizontal-bone-loss", ru:"Горизонтальная убыль кости", group:"periodontal" },
   { id:"vertical-bone-loss", ru:"Вертикальная убыль кости", group:"periodontal" },

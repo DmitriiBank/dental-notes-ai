@@ -86,6 +86,8 @@ export const HEBREW_FINDINGS: Record<string, HebrewPhrase> = {
   "overfilled-canals": { label: "חומר מילוי תעלות מעבר לאפקס" },
   "separated-instrument": { label: "קטע מכשיר בתעלה" },
   "defective-restoration-margin": { label: "אי-התאמה שולית של שחזור" },
+  "crown-margin-adapted": { label: "התאמה שולית תקינה של הכתר" },
+  "crown-margin-gap": { label: "אי-התאמה שולית של הכתר" },
   fistula: { label: "פיסטולה" },
   swelling: { label: "נפיחות" },
   impacted: { label: "שן כלואה" },

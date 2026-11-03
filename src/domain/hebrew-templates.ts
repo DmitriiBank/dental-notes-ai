@@ -26,14 +26,15 @@ const cleanOutput = (value: string) => value.replace(/[“”]/gu, '"').replace(
 function imagingSentence(imaging: Imaging): string {
   const label = IMAGING_LABELS[imaging.kind] ?? imaging.kind;
   const target = imaging.target ? ` עבור ${imaging.target}` : "";
-  if (imaging.status === "refused") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}`);
-  if (imaging.status !== "reviewed") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}`);
+  const purpose = imaging.purpose === "crown-fit-check" ? " לצורך בדיקת התאמת הכתר" : "";
+  if (imaging.status === "refused") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}${purpose}`);
+  if (imaging.status !== "reviewed") return sentence(`${IMAGING_STATUS[imaging.status]} ${label}${target}${purpose}`);
   const findingText = unique(imaging.findings).map(key => phrase(HEBREW_FINDINGS, key));
   const fractureDetails=imaging.findings.some(key=>key==="root-fracture-suspected"||key==="root-fracture-observed")
     ? [imaging.rootFractureLocation&&imaging.rootFractureLocation!=="unknown"?`מיקום ${imaging.rootFractureLocation}`:"",imaging.rootFractureOrientation&&imaging.rootFractureOrientation!=="undetermined"?`כיוון ${imaging.rootFractureOrientation}`:""].filter(Boolean).join(", ")
     : "";
   const details = [hebrewList(findingText),fractureDetails, imaging.notes].filter(Boolean).join("; ");
-  return sentence(`${label}${target} נבדק${details ? `: ${details}` : ""}`);
+  return sentence(`${label}${target} נבדק${purpose ? ` ${purpose.trim()}` : ""}${details ? `: ${details}` : ""}`);
 }
 
 function treatmentText(treatment: Treatment): string {
