@@ -7,13 +7,22 @@ import { useExamStore } from "@/store/examination-store";
 describe("versioned complaint catalog with the 107 supplied entries and the added return-after-imaging reason",()=>{
   beforeEach(()=>{localStorage.clear();useExamStore.getState().reset()});
 
-  it("contains exactly 111 unique deterministic entries",()=>{
-    expect(COMPLAINT_CATALOG).toHaveLength(111);
-    expect(new Set(COMPLAINT_CATALOG.map(item=>item.id)).size).toBe(111);
+  it("contains exactly 112 unique deterministic entries",()=>{
+    expect(COMPLAINT_CATALOG).toHaveLength(112);
+    expect(new Set(COMPLAINT_CATALOG.map(item=>item.id)).size).toBe(112);
     expect(COMPLAINT_CATALOG.every(item=>item.ru&&item.he&&item.category&&item.scope)).toBe(true);
   });
 
   it("preserves supplied emergency, removable and implant catalog entries",()=>{const ids=new Set(COMPLAINT_CATALOG.map(item=>item.id));expect(ids.has("denture-pain")).toBe(true);expect(ids.has("bleeding-after-extraction")).toBe(true);expect(ids.has("implant-crown-loose")).toBe(true)});
+
+  it("offers continuation of treatment as a frequent general visit reason",()=>{
+    const entry=COMPLAINT_CATALOG.find(item=>item.id==="general.continue-treatment");
+    expect(entry).toMatchObject({scope:"general",frequent:true,ru:"Явился для продолжения лечения"});
+    const draft=emptyDraft();
+    draft.generalComplaints=[{complaintId:"general.continue-treatment"}];
+    expect(complaintSentences(draft)).toEqual(["המטופל הגיע להמשך טיפול."]);
+    expect(generateHebrewRecord(draft)).toContain("סיבת הביקור:\\nהמטופל הגיע להמשך טיפול.");
+  });
 
   it("does not turn a complaint into treatment, imaging or diagnosis",()=>{const draft=emptyDraft();draft.teeth[12].complaints=[{complaintId:"crown-off"}];const text=generateHebrewRecord(draft);expect(text).toContain("השתחררות של כתר");expect(text).toContain("בשן 12");expect(text).not.toMatch(/בוצע|הודבק|אובחנה|צילום|אנטיביוטיקה/u)});
 
