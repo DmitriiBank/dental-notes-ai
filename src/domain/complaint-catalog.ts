@@ -19,6 +19,17 @@ export const COMPLAINT_REGIONS=COMPLAINT_MODIFIERS.location.filter(item=>item.id
 const byId=new Map(COMPLAINT_CATALOG.map(item=>[item.id,item]));
 const modifier=(kind:keyof typeof COMPLAINT_MODIFIERS,id?:string)=>id?(COMPLAINT_MODIFIERS[kind] as ComplaintModifier[]).find(item=>item.id===id)?.phraseHe??"":"";
 const sentence=(value:string)=>`${value.trim().replace(/[.;]+$/u,"")}.`;
+/** Location completes the complaint phrase, rather than becoming a comma-separated list item. */
+const withLocation=(complaint:string,location:string):string=>{
+  if(!location)return complaint;
+  const singleTooth=location.match(/^בשן (\d+)$/u);
+  if(singleTooth&&complaint.endsWith("בשן"))return `${complaint} ${singleTooth[1]}`;
+  const manyTeeth=location.startsWith("בשיניים ");
+  if(manyTeeth&&complaint.endsWith("בשן"))return `${complaint.slice(0,-"בשן".length)}${location}`.trim();
+  if(complaint.endsWith("בלסת")&&location.startsWith("בלסת "))return `${complaint} ${location.slice("בלסת ".length)}`;
+  return `${complaint} ${location}`;
+};
+const complaintWithDetails=(complaint:string,location:string,details:string[])=>[withLocation(complaint,location),...details].filter(Boolean).join(", ");
 const detailParts=(selection:ComplaintSelection)=>[
   modifier("onset",selection.onset),
   modifier("intensity",selection.intensity??selection.severity),
@@ -30,8 +41,8 @@ const detailParts=(selection:ComplaintSelection)=>[
 export function complaintSentences(draft:ClinicalDraft):string[]{
   const grouped=new Map<string,{entry:ComplaintCatalogItem;selection:ComplaintSelection;teeth:number[]}>();
   Object.values(draft.teeth).forEach(tooth=>(tooth.complaints??[]).forEach(selection=>{const entry=byId.get(selection.complaintId);if(!entry)return;const key=JSON.stringify([selection.complaintId,selection.onset,selection.intensity??selection.severity,selection.pattern,selection.triggers??selection.trigger,selection.patientGoal]);const group=grouped.get(key)??{entry,selection,teeth:[]};group.teeth.push(tooth.number);grouped.set(key,group)}));
-  const result=[...grouped.values()].map(({entry,selection,teeth})=>{const sorted=[...new Set(teeth)].sort((a,b)=>a-b);const target=sorted.length===1?`בשן ${sorted[0]}`:`בשיניים ${hebrewList(sorted.map(String))}`;if(entry.id==="no-complaints")return sentence(sorted.length===1?`לדברי המטופל/ת, אין תלונות הקשורות לשן ${sorted[0]}`:`לדברי המטופל/ת, אין תלונות הקשורות לשיניים ${hebrewList(sorted.map(String))}`);return sentence(`לדברי המטופל/ת, ${[entry.he,target,...detailParts(selection)].join(", ")}`)});
-  (draft.regionalComplaints??[]).forEach(selection=>{const entry=byId.get(selection.complaintId);if(!entry)return;const location=modifier("location",selection.region);result.push(sentence(entry.id==="no-complaints"?`לדברי המטופל/ת, אין תלונות${location?` ${location}`:""}`:`לדברי המטופל/ת, ${[entry.he,location,...detailParts(selection)].filter(Boolean).join(", ")}`))});
+  const result=[...grouped.values()].map(({entry,selection,teeth})=>{const sorted=[...new Set(teeth)].sort((a,b)=>a-b);const target=sorted.length===1?`בשן ${sorted[0]}`:`בשיניים ${hebrewList(sorted.map(String))}`;if(entry.id==="no-complaints")return sentence(sorted.length===1?`לדברי המטופל/ת, אין תלונות הקשורות לשן ${sorted[0]}`:`לדברי המטופל/ת, אין תלונות הקשורות לשיניים ${hebrewList(sorted.map(String))}`);return sentence(`לדברי המטופל/ת, ${complaintWithDetails(entry.he,target,detailParts(selection))}`)});
+  (draft.regionalComplaints??[]).forEach(selection=>{const entry=byId.get(selection.complaintId);if(!entry)return;const location=modifier("location",selection.region);result.push(sentence(entry.id==="no-complaints"?`לדברי המטופל/ת, אין תלונות${location?` ${location}`:""}`:`לדברי המטופל/ת, ${complaintWithDetails(entry.he,location,detailParts(selection))}`))});
   (draft.generalComplaints??[]).forEach(selection=>{const entry=byId.get(selection.complaintId);if(!entry)return;if(entry.id==="general.return-after-imaging-for-diagnosis-and-plan"){result.push(sentence(entry.he));return}result.push(sentence(entry.id==="no-complaints"?"לדברי המטופל/ת, אין תלונות":`לדברי המטופל/ת, ${[entry.he,...detailParts(selection)].filter(Boolean).join(", ")}`))});
   return [...new Set(result)];
 }
