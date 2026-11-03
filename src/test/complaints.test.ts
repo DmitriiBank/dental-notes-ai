@@ -21,7 +21,7 @@ describe("versioned complaint catalog with the 107 supplied entries and the adde
     const draft=emptyDraft();
     draft.generalComplaints=[{complaintId:"general.continue-treatment"}];
     expect(complaintSentences(draft)).toEqual(["המטופל הגיע להמשך טיפול."]);
-    expect(generateHebrewRecord(draft)).toContain("סיבת הביקור:\\nהמטופל הגיע להמשך טיפול.");
+    expect(generateHebrewRecord(draft)).toContain("סיבת הביקור:\nהמטופל הגיע להמשך טיפול.");
   });
 
   it("does not turn a complaint into treatment, imaging or diagnosis",()=>{const draft=emptyDraft();draft.teeth[12].complaints=[{complaintId:"crown-off"}];const text=generateHebrewRecord(draft);expect(text).toContain("השתחררות של כתר");expect(text).toContain("בשן 12");expect(text).not.toMatch(/בוצע|הודבק|אובחנה|צילום|אנטיביוטיקה/u)});
