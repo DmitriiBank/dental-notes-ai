@@ -789,6 +789,13 @@
       "labelRu": "Дискомфорт в области лунки после удаления",
       "phraseHe": "אי נוחות באזור מכתשית העקירה",
       "patientReported": true
+    },
+    {
+      "id": "general.continue-treatment",
+      "category": "aesthetic",
+      "labelRu": "Явился для продолжения лечения",
+      "phraseHe": "המטופל הגיע להמשך טיפול",
+      "patientReported": true
     }
   ],
   "modifiers": {
